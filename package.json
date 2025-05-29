@@ -1,0 +1,17 @@
+{
+  "name": "cod-studio-3",
+  "version": "42.2.0",
+  "description": "AI Reasoning Studio with Chain of Draft methodology",
+  "main": "index.html",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "echo 'No build step needed for static site'",
+    "deploy": "vercel --prod"
+  },
+  "keywords": ["ai", "reasoning", "chain-of-draft", "fireworks"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "vercel": "^33.0.0"
+  }
+}

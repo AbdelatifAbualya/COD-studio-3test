@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI Reasoning Studio (Qwen3-235B)</title>
+  <title>AI Reasoning Studio - Minimal CoD (Qwen3-235B)</title>
   
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -222,10 +223,10 @@
     <div class="flex-1 flex flex-col overflow-hidden">
       <!-- Header -->
       <header class="bg-dark-700 border-b border-dark-600 h-16 flex items-center justify-between px-4 md:px-6">
-        <h1 id="pageTitle" class="text-xl font-semibold">AI Reasoning Studio (Auto-COD)</h1>
+        <h1 id="pageTitle" class="text-xl font-semibold">AI Reasoning Studio - Minimal CoD (Qwen3-235B)</h1>
         <div class="flex items-center gap-3">
           <div id="currentModelDisplay" class="bg-dark-600 text-sm px-3 py-1.5 rounded-lg flex items-center">
-            <span>Qwen3-235B (Auto-COD)</span>
+            <span>Qwen3-235B (Fireworks AI)</span>
           </div>
           <button id="openSettings" class="flex items-center gap-1.5 bg-dark-600 hover:bg-dark-500 text-gray-300 px-3 py-1.5 rounded-lg transition">
             <span>Settings</span>
@@ -297,14 +298,6 @@
         <div id="reasoningTab" class="tab-content hidden">
           <h3 class="text-lg font-medium mb-4 pb-2 border-b border-dark-600">Reasoning Method</h3>
           
-          <div class="flex justify-between items-center mb-4 pb-2 border-b border-dark-600">
-            <h3 class="text-lg font-medium">Enable Automatic COD Selection</h3>
-            <label class="relative inline-flex items-center cursor-pointer">
-              <input type="checkbox" id="autoCodToggle" class="sr-only peer" checked>
-              <div class="w-11 h-6 bg-dark-500 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
-            </label>
-          </div>
-          
           <div class="bg-dark-600 border border-dark-500 rounded-lg p-4 mb-5">
             <div class="space-y-3">
               <div class="flex items-start">
@@ -318,22 +311,23 @@
               <div class="flex items-start">
                 <input type="radio" id="codReasoning" name="reasoningMethod" value="cod" checked class="w-4 h-4 mt-1 text-primary-500 bg-dark-500 border-dark-400 focus:ring-primary-500 focus:ring-offset-dark-700">
                 <label for="codReasoning" class="ml-3 block text-sm font-medium text-white">
-                  Chain of Draft (CoD) with Detailed Reflections
-                  <div class="text-gray-400 text-xs mt-1">Uses minimal words (1-5 max) per CoD step, interspersed with 3 detailed reflections (no word limit), and a detailed final answer.</div>
+                  Minimal Chain of Draft (1-5 Steps + Reflections)
+                  <div class="text-gray-400 text-xs mt-1">Uses ONLY 1-5 CoD steps maximum, with 1-2 focused reflections, and a detailed final answer.</div>
                 </label>
               </div>
             </div>
           </div>
           
           <div id="codOptions" class="mb-5">
-            <h4 class="text-sm font-medium text-gray-300 mb-2">Chain of Draft Configuration:</h4>
+            <h4 class="text-sm font-medium text-gray-300 mb-2">Minimal Chain of Draft Configuration:</h4>
             <div class="bg-dark-600 border border-dark-500 rounded-lg p-3">
                 <p class="text-xs text-gray-400">
-                    Chain of Draft (CoD) is configured to instruct the model to:
+                    Minimal Chain of Draft (CoD) is configured to instruct the model to:
                     <ul class="list-disc list-inside ml-4 mt-1">
-                        <li>Use extremely concise CoD steps (1-5 words each).</li>
-                        <li>Insert 3 "Detailed Reflection X:" blocks during thinking (no word limit).</li>
+                        <li>Use ONLY 1-5 CoD steps maximum (15-25 words each).</li>
+                        <li>Insert 1-2 "Detailed Reflection:" blocks during thinking (no word limit).</li>
                         <li>Provide a comprehensive final answer.</li>
+                        <li>Be extremely concise and focused in reasoning.</li>
                     </ul>
                 </p>
             </div>
@@ -349,22 +343,23 @@
           
           <div id="selfReflectionInfo" class="bg-dark-600 border border-dark-500 rounded-lg p-4 mb-5">
             <p class="text-gray-400 text-sm mb-3">
-              If enabled, adds a *brief* (1-5 words) final self-check reflection (starting with "Reflection:") just before the CoD final answer. This is in addition to the three detailed reflections.
+              If enabled, adds a *brief* (15-25 words) final self-check reflection (starting with "Reflection:") just before the CoD final answer. This is in addition to the 1-2 detailed reflections.
             </p>
             <div class="bg-dark-700 rounded-lg p-4">
               <div class="flex items-center text-purple-300 text-sm font-medium mb-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
-                How CoD with Reflections Works
+                How Minimal CoD with Reflections Works
               </div>
               <div class="text-gray-400 text-xs">
-                When using Chain of Draft:
+                When using Minimal Chain of Draft:
                 <ul class="list-disc list-inside mt-2 space-y-1">
-                  <li>Model uses extremely concise CoD steps (1-5 words).</li>
-                  <li>Model intersperses 3 "DETAILED REFLECTION X:" blocks (verbose, no word limit) during its thinking.</li>
+                  <li>Model uses ONLY 1-5 concise CoD steps (15-25 words each).</li>
+                  <li>Model intersperses 1-2 "DETAILED REFLECTION:" blocks (verbose, no word limit) during its thinking.</li>
                   <li>If "Final Brief Self-Reflection" is enabled, model adds one short "Reflection:" step before the final answer.</li>
                   <li>The final answer (after `####`) is comprehensive and detailed.</li>
+                  <li>Focus is on extreme conciseness while maintaining reasoning quality.</li>
                 </ul>
               </div>
             </div>
@@ -439,9 +434,9 @@
           <div class="mb-4">
             <div class="flex justify-between items-center mb-2">
               <label for="maxTokens" class="block text-sm font-medium text-gray-300">Max Tokens</label>
-              <span id="maxTokensValue" class="text-sm text-gray-400">4096</span>
+              <span id="maxTokensValue" class="text-sm text-gray-400">8192</span>
             </div>
-            <input type="range" id="maxTokens" min="1" max="8192" step="128" value="4096" class="w-full h-2 rounded-lg appearance-none cursor-pointer">
+            <input type="range" id="maxTokens" min="1" max="16384" step="128" value="8192" class="w-full h-2 rounded-lg appearance-none cursor-pointer">
             <p class="text-xs text-gray-500 mt-1">Maximum length of the response. (Qwen3-235B context is larger, but completions are often capped)</p>
           </div>
         </div>
@@ -507,155 +502,16 @@
 
     let REASONING_METHOD = "cod";
     let SELF_REFLECTION_ENABLED = true;
-    let AUTO_COD_ENABLED = true; // Enable automatic COD selection
     
     let TEMPERATURE = 0.6;
     let TOP_P = 1;
     let TOP_K = 40;
-    let MAX_TOKENS = 4096;
+    let MAX_TOKENS = 8192;
     let PRESENCE_PENALTY = 0;
     let FREQUENCY_PENALTY = 0;
     let ENABLE_STREAMING = true;
     let ENABLED_MCP_TOOLS = [];
     let enableWebSearchQuickToggle = false; 
-    
-    /***********************
-     * Problem Complexity Analysis
-     ***********************/
-    function analyzeProblemComplexity(message) {
-      const PROBLEM_COMPLEXITY = {
-        hasMath: false,
-        hasLogic: false,
-        multiStep: false,
-        complexity: "simple",
-        estimatedSteps: 0,
-        wordCount: message.split(/\s+/).length,
-        finalReasoningMethod: "standard"
-      };
-
-      // Math pattern recognition
-      const mathPatterns = [
-        /(?:calculate|compute|solve|find|determine|derive|evaluate)\s+(?:the\s+)?(?:value|result|answer|solution)/i,
-        /\d+\s*[+\-*/=]\s*\d+/,
-        /(?:equation|formula|theorem|proof|integral|derivative|limit|sum|product)/i,
-        /(?:x|y|z|n|a|b|c)\s*[=+\-*/^]\s*\d+/i,
-        /(?:sin|cos|tan|log|ln|exp|sqrt|abs|floor|ceil)\s*\(/i,
-        /\d+\s*(?:squared|cubed|to the power|raised to)/i,
-        /(?:percentage|percent|ratio|proportion|rate|average|mean|median|mode)/i,
-        /(?:algebra|geometry|trigonometry|calculus|statistics|probability)/i
-      ];
-
-      // Logic pattern recognition
-      const logicPatterns = [
-        /if\s+.+\s+then\s+.+/i,
-        /(?:because|since|therefore|thus|hence|consequently|as a result)/i,
-        /(?:given that|assuming|suppose|let's say|consider)/i,
-        /(?:compare|contrast|analyze|evaluate|assess|examine)/i,
-        /(?:pros and cons|advantages and disadvantages|benefits and drawbacks)/i,
-        /(?:step by step|systematically|methodically|logically)/i,
-        /(?:deduce|infer|conclude|reason|logic|logical)/i
-      ];
-
-      // Multi-step pattern recognition
-      const multiStepPatterns = [
-        /(?:first|second|third|next|then|finally|lastly)/i,
-        /(?:step\s+\d+|phase\s+\d+|stage\s+\d+)/i,
-        /(?:multiple|several|various|different|each|every)/i,
-        /(?:after that|following this|subsequently|once)/i,
-        /(?:break down|break apart|separate|divide|split)/i,
-        /(?:complex|complicated|involved|detailed|comprehensive)/i
-      ];
-
-      // Check for math patterns
-      for (const pattern of mathPatterns) {
-        if (pattern.test(message)) {
-          PROBLEM_COMPLEXITY.hasMath = true;
-          break;
-        }
-      }
-
-      // Check for logic patterns
-      for (const pattern of logicPatterns) {
-        if (pattern.test(message)) {
-          PROBLEM_COMPLEXITY.hasLogic = true;
-          break;
-        }
-      }
-
-      // Check for multi-step patterns
-      for (const pattern of multiStepPatterns) {
-        if (pattern.test(message)) {
-          PROBLEM_COMPLEXITY.multiStep = true;
-          break;
-        }
-      }
-
-      // Determine complexity
-      let complexityScore = 0;
-      if (PROBLEM_COMPLEXITY.hasMath) complexityScore += 1;
-      if (PROBLEM_COMPLEXITY.hasLogic) complexityScore += 1;
-      if (PROBLEM_COMPLEXITY.multiStep) complexityScore += 1;
-
-      // Apply more specific pattern checks
-      // Advanced math indicators
-      if (/(?:calculus|differential|integral|equation system|probability|statistics|algebra|geometry)/i.test(message)) {
-        complexityScore += 1;
-      }
-
-      // Long problems are often complex
-      if (message.length > 500) {
-        complexityScore += 1;
-      }
-
-      // Multiple constraints or variables
-      if (message.match(/(?:constraint|variable|unknown|factor|parameter|condition)/gi)?.length > 2) {
-        complexityScore += 1;
-      }
-
-      // Update complexity level
-      if (complexityScore >= 3) {
-        PROBLEM_COMPLEXITY.complexity = "complex";
-        PROBLEM_COMPLEXITY.estimatedSteps = Math.max(
-          5,
-          Math.min(20, Math.ceil(PROBLEM_COMPLEXITY.wordCount / 15))
-        );
-      } else if (complexityScore >= 1) {
-        PROBLEM_COMPLEXITY.complexity = "normal";
-        PROBLEM_COMPLEXITY.estimatedSteps = Math.max(
-          3,
-          Math.min(10, Math.ceil(PROBLEM_COMPLEXITY.wordCount / 20))
-        );
-      } else {
-        PROBLEM_COMPLEXITY.complexity = "simple";
-        PROBLEM_COMPLEXITY.estimatedSteps = Math.max(
-          2,
-          Math.min(5, Math.ceil(PROBLEM_COMPLEXITY.wordCount / 25))
-        );
-      }
-
-      // Adjust the estimated steps based on problem characteristics
-      if (PROBLEM_COMPLEXITY.hasMath && PROBLEM_COMPLEXITY.multiStep) {
-        PROBLEM_COMPLEXITY.estimatedSteps += 2;
-      }
-      if (PROBLEM_COMPLEXITY.hasLogic) {
-        PROBLEM_COMPLEXITY.estimatedSteps += 1;
-      }
-
-      // If the problem has math expressions, ensure minimum steps
-      if (PROBLEM_COMPLEXITY.hasMath) {
-        PROBLEM_COMPLEXITY.estimatedSteps = Math.max(PROBLEM_COMPLEXITY.estimatedSteps, 4);
-      }
-
-      // Determine final reasoning method - COD starts at complexity score 1
-      if (complexityScore >= 1) {
-        PROBLEM_COMPLEXITY.finalReasoningMethod = "cod";
-      } else {
-        PROBLEM_COMPLEXITY.finalReasoningMethod = "standard";
-      }
-
-      console.log(`Problem analysis: ${JSON.stringify(PROBLEM_COMPLEXITY)}`);
-      return PROBLEM_COMPLEXITY;
-    }
     
     /***********************
      * Thread Management
@@ -746,7 +602,11 @@
         return; 
       }
       
-      let content = `AI Reasoning Studio - Auto-COD Mode\nModel: ${FIREWORKS_MODEL}\n\n`;
+      let content = `AI Reasoning Studio - Minimal CoD - ${REASONING_METHOD.toUpperCase()}`;
+      if (REASONING_METHOD === "cod") { 
+        content += ` (1-5 Steps + Reflections Mode)`; 
+      }
+      content += `\nModel: ${FIREWORKS_MODEL}\n\n`;
       
       thread.messages.forEach(msg => {
         if (msg.isPlaceholder) return;
@@ -754,9 +614,6 @@
         content += `${prefix}:\n${msg.content}\n\n`;
         
         if (msg.sender === 'bot' && !msg.isPlaceholder && !msg.isStreaming) {
-          if (msg.detectedComplexity) {
-            content += `(Auto-Analysis: ${msg.detectedComplexity.complexity.toUpperCase()}, Method: ${msg.detectedComplexity.finalReasoningMethod.toUpperCase()}, Steps: ${msg.detectedComplexity.estimatedSteps})\n`;
-          }
           if (msg.wordCount !== undefined) {
             content += `(Words: ${msg.wordCount}`;
             if (msg.thinkingWordCount !== undefined && msg.answerWordCount !== undefined) {
@@ -782,7 +639,7 @@
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `${thread.name || "Thread"}_AutoCOD.txt`;
+      a.download = `${thread.name || "Thread"}.txt`;
       a.style.display = 'none';
       document.body.appendChild(a);
       a.click();
@@ -934,7 +791,7 @@
         const length = cleanedThinking.length;
 
         const findNextMarkerInfo = (text, pos) => {
-          const drRegex = /DETAILED REFLECTION\s*(\d+)\s*:/gi;
+          const drRegex = /DETAILED REFLECTION\s*(\d*)\s*:/gi;
           const frRegex = SELF_REFLECTION_ENABLED ? /Reflection:/gi : null; 
 
           drRegex.lastIndex = 0; 
@@ -956,7 +813,7 @@
               type: 'detailed_reflection', 
               index: drPos, 
               markerText: drMatch[0], 
-              number: drMatch[1], 
+              number: drMatch[1] || '', 
               endOfMarker: drPos + drMatch[0].length 
             };
           } else if (frPos < drPos) { 
@@ -1073,11 +930,11 @@
               
               const thinkingLabel = document.createElement("div");
               thinkingLabel.className = "text-xs uppercase tracking-wider font-semibold text-gray-400 mb-3 pb-2 border-b border-dark-500";
-              thinkingLabel.textContent = "Chain of Draft & Reflections";
+              thinkingLabel.textContent = "Minimal Chain of Draft & Reflections (1-5 Steps)";
               thinkingContainer.appendChild(thinkingLabel);
               
               const thinkingContentDiv = document.createElement("div");
-              thinkingContentDiv.innerHTML = formatThinkingSteps(msg.thinking, msg.reasoningMethod ? msg.reasoningMethod.toLowerCase().split('-')[0] : 'cod');
+              thinkingContentDiv.innerHTML = formatThinkingSteps(msg.thinking, msg.reasoningMethod ? msg.reasoningMethod.toLowerCase().split('-')[0] : REASONING_METHOD);
               thinkingContainer.appendChild(thinkingContentDiv);
               msgContent.appendChild(thinkingContainer);
               
@@ -1112,16 +969,6 @@
               statsDiv.className = "mt-3 pt-2 border-t border-dark-600/50 text-xs text-gray-400 flex flex-wrap gap-x-4 gap-y-1 items-center";
               
               let statsAdded = false;
-
-              // Add complexity analysis info
-              if (msg.detectedComplexity) {
-                const complexityMethodText = msg.detectedComplexity.finalReasoningMethod === 'cod' ? 'CoD' : 'Standard';
-                const complexityStat = document.createElement('span');
-                complexityStat.innerHTML = `Mode: <span class="text-purple-300 font-medium">${complexityMethodText}</span> (${msg.detectedComplexity.complexity})`;
-                statsDiv.appendChild(complexityStat);
-                statsAdded = true;
-              }
-
               if (msg.wordCount !== undefined) {
                 let badgeText = `Words: <span class="text-gray-300">${msg.wordCount}</span>`;
                 if (msg.thinkingWordCount !== undefined && msg.answerWordCount !== undefined && (msg.thinkingWordCount > 0 || msg.answerWordCount > 0)) {
@@ -1175,19 +1022,13 @@
       msgContent.appendChild(filesDiv);
     }
     
-    function addMessageToCurrentThread(content, sender, isPlaceholder = false, files = [], detectedComplexity = null) {
+    function addMessageToCurrentThread(content, sender, isPlaceholder = false, files = []) {
       const thread = threads.find(t => t.id === currentThreadId);
       if (thread) {
         let thinking = null, answer = null, thinkingWordCount = 0, answerWordCount = 0, totalWordCount = 0;
-        let actualReasoningMethod = REASONING_METHOD;
         
         if (sender === "bot" && !isPlaceholder) {
-          // Determine actual reasoning method used based on detected complexity
-          if (detectedComplexity) {
-            actualReasoningMethod = detectedComplexity.finalReasoningMethod;
-          }
-          
-          const processed = processBotMessage(content, actualReasoningMethod);
+          const processed = processBotMessage(content, REASONING_METHOD);
           thinking = processed.thinking; 
           answer = processed.answer;
           thinkingWordCount = processed.thinkingWordCount || 0; 
@@ -1201,29 +1042,24 @@
           isPlaceholder, 
           timestamp: new Date(),
           wordCount: sender === "bot" && !isPlaceholder ? totalWordCount : (countWords(content) || 0),
-          reasoningMethod: sender === "bot" && !isPlaceholder ? actualReasoningMethod.toUpperCase() : undefined,
+          reasoningMethod: sender === "bot" && !isPlaceholder ? REASONING_METHOD.toUpperCase() : undefined,
           thinking, 
           answer, 
           thinkingWordCount, 
           answerWordCount,
           files: files && files.length > 0 ? files.map(f => ({ name: f.name, type: f.type, size: f.size })) : undefined,
-          detectedComplexity: detectedComplexity
         });
         renderCurrentThreadMessages();
       }
     }
     
-    function buildMessagesForChat(detectedMethod = null) {
+    function buildMessagesForChat() {
       const thread = threads.find(t => t.id === currentThreadId);
       if (!thread) return [];
       
       const messages = [];
-      
-      // Determine which reasoning method to use
-      const methodToUse = detectedMethod || REASONING_METHOD;
-      
-      if (methodToUse !== "standard") {
-        messages.push({ role: "system", content: PROMPTS[methodToUse] });
+      if (REASONING_METHOD !== "standard") {
+        messages.push({ role: "system", content: PROMPTS[REASONING_METHOD] });
       }
       
       thread.messages.filter(msg => !msg.isPlaceholder).forEach(msg => {
@@ -1265,16 +1101,6 @@
     async function sendMessage(message) {
       ENABLE_STREAMING = (localStorage.getItem('streamingEnabled') !== null) ? (localStorage.getItem('streamingEnabled') === 'true') : ENABLE_STREAMING;
       
-      // Analyze problem complexity if auto-COD is enabled
-      let detectedComplexity = null;
-      let effectiveReasoningMethod = REASONING_METHOD;
-
-      if (AUTO_COD_ENABLED) {
-        detectedComplexity = analyzeProblemComplexity(message);
-        effectiveReasoningMethod = detectedComplexity.finalReasoningMethod;
-        console.log(`Auto-COD Decision: ${effectiveReasoningMethod.toUpperCase()} (complexity: ${detectedComplexity.complexity})`);
-      }
-      
       addMessageToCurrentThread(message, "user", false, attachedFiles.map(f => ({name: f.name, type: f.type, size: f.size})));
       attachedFiles = []; 
       const attachedFilesContainer = document.getElementById('attachedFiles');
@@ -1284,11 +1110,6 @@
       }
       
       let placeholderText = "Thinking...";
-      if (AUTO_COD_ENABLED && detectedComplexity) {
-        const methodName = detectedComplexity.finalReasoningMethod === 'cod' ? 'Chain of Draft' : 'Standard';
-        placeholderText = `Analyzing (${detectedComplexity.complexity}) → Using ${methodName}...`;
-      }
-      
       addMessageToCurrentThread(placeholderText, "bot", true);
       const thread = threads.find(t => t.id === currentThreadId);
       const placeholderIndex = thread.messages.length - 1;
@@ -1297,11 +1118,11 @@
       let usageData = null; 
     
       try {
-        const messagesForApi = buildMessagesForChat(effectiveReasoningMethod);
+        const messagesForApi = buildMessagesForChat();
         const tools = getToolsConfiguration();
         let validatedMaxTokens = parseInt(MAX_TOKENS);
-        if (isNaN(validatedMaxTokens) || !isFinite(validatedMaxTokens)) validatedMaxTokens = 4096;
-        validatedMaxTokens = Math.min(Math.max(1, validatedMaxTokens), 8192);
+        if (isNaN(validatedMaxTokens) || !isFinite(validatedMaxTokens)) validatedMaxTokens = 8192;
+        validatedMaxTokens = Math.min(Math.max(1, validatedMaxTokens), 16384);
         
         const payload = { 
           model: FIREWORKS_MODEL, 
@@ -1407,8 +1228,7 @@
                       isPlaceholder: false, 
                       timestamp: new Date(), 
                       isStreaming: true, 
-                      tool_calls: currentToolCalls.length > 0 ? JSON.parse(JSON.stringify(currentToolCalls)) : undefined,
-                      detectedComplexity: detectedComplexity
+                      tool_calls: currentToolCalls.length > 0 ? JSON.parse(JSON.stringify(currentToolCalls)) : undefined 
                     };
                     
                     if (!renderPending) { 
@@ -1437,14 +1257,7 @@
           
           const endTime = performance.now();
           const durationSeconds = ((endTime - startTime) / 1000).toFixed(2);
-          
-          // Determine the actual reasoning method used
-          let actualReasoningMethod = REASONING_METHOD;
-          if (AUTO_COD_ENABLED && detectedComplexity) {
-            actualReasoningMethod = detectedComplexity.finalReasoningMethod;
-          }
-          
-          const processed = processBotMessage(fullResponse, actualReasoningMethod);
+          const processed = processBotMessage(fullResponse, REASONING_METHOD);
           
           thread.messages[placeholderIndex] = { 
             content: fullResponse, 
@@ -1452,7 +1265,7 @@
             isPlaceholder: false, 
             timestamp: new Date(), 
             wordCount: (processed.thinkingWordCount || 0) + (processed.answerWordCount || 0), 
-            reasoningMethod: actualReasoningMethod.toUpperCase(), 
+            reasoningMethod: REASONING_METHOD.toUpperCase(), 
             thinking: processed.thinking, 
             answer: processed.answer, 
             thinkingWordCount: processed.thinkingWordCount || 0, 
@@ -1462,8 +1275,7 @@
             durationSeconds: durationSeconds,
             promptTokens: usageData ? usageData.prompt_tokens : undefined,
             completionTokens: usageData ? usageData.completion_tokens : undefined,
-            totalTokens: usageData ? usageData.total_tokens : undefined,
-            detectedComplexity: detectedComplexity
+            totalTokens: usageData ? usageData.total_tokens : undefined
           };
           renderCurrentThreadMessages();
     
@@ -1502,14 +1314,7 @@
           
           if (botReply || toolCalls) {
             const finalContent = botReply || ""; 
-            
-            // Determine the actual reasoning method used
-            let actualReasoningMethod = REASONING_METHOD;
-            if (AUTO_COD_ENABLED && detectedComplexity) {
-              actualReasoningMethod = detectedComplexity.finalReasoningMethod;
-            }
-            
-            const processed = processBotMessage(finalContent, actualReasoningMethod);
+            const processed = processBotMessage(finalContent, REASONING_METHOD);
             
             thread.messages[placeholderIndex] = { 
                 content: finalContent, 
@@ -1517,7 +1322,7 @@
                 isPlaceholder: false, 
                 timestamp: new Date(), 
                 wordCount: (processed.thinkingWordCount || 0) + (processed.answerWordCount || 0), 
-                reasoningMethod: actualReasoningMethod.toUpperCase(), 
+                reasoningMethod: REASONING_METHOD.toUpperCase(), 
                 thinking: processed.thinking, 
                 answer: processed.answer, 
                 thinkingWordCount: processed.thinkingWordCount || 0, 
@@ -1526,8 +1331,7 @@
                 durationSeconds: durationSeconds,
                 promptTokens: usageData ? usageData.prompt_tokens : undefined,
                 completionTokens: usageData ? usageData.completion_tokens : undefined,
-                totalTokens: usageData ? usageData.total_tokens : undefined,
-                detectedComplexity: detectedComplexity
+                totalTokens: usageData ? usageData.total_tokens : undefined
             };
             renderCurrentThreadMessages();
           } else { 
@@ -1554,8 +1358,7 @@
             answer: null, 
             thinkingWordCount: 0, 
             answerWordCount: 0,
-            durationSeconds: durationSeconds,
-            detectedComplexity: detectedComplexity
+            durationSeconds: durationSeconds, 
         };
         renderCurrentThreadMessages();
       }
@@ -1618,6 +1421,7 @@
         btn.classList.remove('bg-dark-500', 'text-gray-300'); 
         btn.title = "Tavily Web Search enabled"; 
       } else { 
+ 
         btn.classList.remove('bg-primary-500', 'text-white'); 
         btn.classList.add('bg-dark-500', 'text-gray-300'); 
         btn.title = "Tavily Web Search disabled"; 
@@ -1697,44 +1501,40 @@
     }
 
     function updateCoDPrompt() {
-      let basePrompt = `You are an AI assistant. Your goal is to solve problems by thinking step-by-step.
-When using Chain of Draft (CoD), adhere to the following structure for the thinking part of your response (before the '####' separator):
+      let basePrompt = `You are an AI assistant. Your goal is to solve problems by thinking step-by-step using MINIMAL Chain of Draft (CoD).
 
-1.  **Concise CoD Steps:** Use extremely short steps (1-5 words maximum per step). Separate each CoD step with a period. Use mathematical notation where possible. Focus on key calculations and essential intermediate results.
-2.  **Detailed Reflections:** After a few CoD steps, or before/after a critical calculation or decision point, insert a "DETAILED REFLECTION X:" block (where X is 1, 2, or 3). You must include exactly three such detailed reflection blocks.
-    *   These "DETAILED REFLECTION" blocks are for a more thorough, verbose examination of your reasoning so far. They are NOT bound by the 1-5 word limit.
-    *   In these blocks, explain your checks, verify intermediate results, discuss potential pitfalls, assess your confidence, and outline sub-goals.
-    *   Resume concise CoD steps after each detailed reflection.
+When using Minimal Chain of Draft (CoD), adhere to the following structure for the thinking part of your response (before the '####' separator):
+
+1. **MAXIMUM 1-5 CoD Steps:** Use ONLY 1-5 concise CoD steps maximum (target 15-25 words per step). Separate each CoD step with a period. Use mathematical notation where possible. Focus on the most essential calculations and key intermediate results only.
+
+2. **1-2 Detailed Reflections:** After a few CoD steps, or at critical decision points, insert 1-2 "DETAILED REFLECTION:" blocks (no numbering required, just "DETAILED REFLECTION:").
+   * These "DETAILED REFLECTION" blocks are for thorough examination of your reasoning so far. They are NOT bound by the 15-25 word limit.
+   * In these blocks, verify calculations, discuss potential issues, assess confidence, and outline remaining sub-goals.
+   * Resume concise CoD steps after each detailed reflection.
+
+3. **Extreme Conciseness:** Be extremely focused and concise. Only include the most essential steps. Skip obvious or trivial intermediate steps.
 
 Example structure of the thinking part:
-Step 1. Step 2. Step 3.
-DETAILED REFLECTION 1: [In this section, I will perform a detailed check of the work done in steps 1-3. I've calculated A and B. I need to ensure these are correct before proceeding to C. My confidence in A is high because it's a direct interpretation. B involved a multi-step calculation, so I'll double check that: (re-calculation or alternative check). My next sub-goal is to combine A and B to find D.]
-Step 4. Step 5.
-DETAILED REFLECTION 2: [Here, I'll review steps 4 and 5. I've found D. Is this value reasonable in the context of the problem? Are there any edge cases I missed for D? I will verify the units. The next step involves using D to calculate E, which is the primary objective.]
-Step 6. Step 7.
-DETAILED REFLECTION 3: [This is my final detailed review before concluding the thinking phase. I have E. I will quickly re-scan all CoD steps and previous detailed reflections. Step 1 was X. Step 2 was Y. Reflection 1 confirmed Z. Step 4 was P. Reflection 2 confirmed Q. All seems consistent. I am now ready to formulate the final answer.]
-`;
+CoD Step 1. CoD Step 2.
+DETAILED REFLECTION: [In this section, I will perform a detailed check of the work done in steps 1-2. I've calculated A. I need to ensure this is correct before proceeding to B. My confidence in A is high because it's straightforward. The next step involves using A to find B, which is the primary objective.]
+CoD Step 3. CoD Step 4.
+DETAILED REFLECTION: [Here I'll review steps 3-4. I have B. Is this value reasonable? Are there edge cases I missed? I will verify the units. All calculations appear consistent. I'm ready to conclude.]`;
 
       const examplesCoDSteps = `
-Some examples of individual concise CoD steps (NOT detailed reflections):
+Examples of minimal CoD steps (ONLY 1-5 steps total):
 Example Problem 1: Jason had 20 lollipops. He gave Denny some. Now Jason has 12. How many did he give?
-Step: Initial: 20.
-Step: Remaining: 12.
-Step: Given: 20-12=8.
+CoD Step 1: Lollipops given = Initial - Remaining = 20 - 12 = 8.
 
 Example Problem 2: Roger has $125. Spends $55. Receives $25. How much now?
-Step: Start: $125.
-Step: Spent: $55.
-Step: After: $70.
-Step: Received: $25.
-Step: Final: $95.
+CoD Step 1: After spending: $125 - $55 = $70.
+CoD Step 2: After receiving: $70 + $25 = $95.
 `;
 
       let finalAnswerInstruction = `
-After all CoD steps and all three DETAILED REFLECTION blocks (and the optional brief final reflection, if applicable), write your final answer after the '####' separator. This final answer must be comprehensive and detailed, fully explaining the solution, the steps taken, and the reasoning behind them. Do not be brief in the final answer.`;
+After all CoD steps and 1-2 DETAILED REFLECTION blocks (and the optional brief final reflection, if applicable), write your final answer after the '####' separator. This final answer must be comprehensive and detailed, fully explaining the solution, the steps taken, and the reasoning behind them. Do not be brief in the final answer.`;
 
       if (SELF_REFLECTION_ENABLED) { 
-        basePrompt += `\nJust before the '####' separator (after all CoD steps and all three DETAILED REFLECTION blocks), add a very brief final self-check reflection starting with 'Reflection:'. This final brief reflection should be concise (1-5 words), e.g., "Reflection: Calculations correct, logical."`;
+        basePrompt += `\nJust before the '####' separator (after all CoD steps and DETAILED REFLECTION blocks), add a very brief final self-check reflection starting with 'Reflection:'. This final brief reflection should be concise (around 15-25 words), e.g., "Reflection: All calculations verified, approach is sound, answer is logical."`;
       }
       
       PROMPTS.cod = basePrompt + examplesCoDSteps + finalAnswerInstruction;
@@ -1795,9 +1595,6 @@ After all CoD steps and all three DETAILED REFLECTION blocks (and the optional b
       
       const selfReflectionToggle = document.getElementById('selfReflectionToggle'); 
       if (selfReflectionToggle) selfReflectionToggle.checked = SELF_REFLECTION_ENABLED;
-
-      const autoCodToggle = document.getElementById('autoCodToggle');
-      if (autoCodToggle) autoCodToggle.checked = AUTO_COD_ENABLED;
       
       setSliderAndValue("temp", TEMPERATURE); 
       setSliderAndValue("topP", TOP_P); 
@@ -1868,12 +1665,6 @@ After all CoD steps and all three DETAILED REFLECTION blocks (and the optional b
       
       const selfReflectionToggle = document.getElementById('selfReflectionToggle'); 
       if (selfReflectionToggle) SELF_REFLECTION_ENABLED = selfReflectionToggle.checked;
-
-      const autoCodToggle = document.getElementById('autoCodToggle');
-      if (autoCodToggle) {
-        AUTO_COD_ENABLED = autoCodToggle.checked;
-        localStorage.setItem('autoCodEnabled', AUTO_COD_ENABLED.toString());
-      }
       
       TEMPERATURE = parseFloat(document.getElementById("temp").value); 
       if (TEMPERATURE === 0 && document.getElementById("temp").min === "0") TEMPERATURE = 0.01;
@@ -1986,13 +1777,6 @@ After all CoD steps and all three DETAILED REFLECTION blocks (and the optional b
       } else {
         SELF_REFLECTION_ENABLED = true; 
       }
-
-      const autoCod = localStorage.getItem("autoCodEnabled");
-      if (autoCod !== null) {
-        AUTO_COD_ENABLED = autoCod === "true";
-      } else {
-        AUTO_COD_ENABLED = true;
-      }
       
       const temp = localStorage.getItem("temperature"); 
       if (temp) TEMPERATURE = parseFloat(temp);
@@ -2017,7 +1801,7 @@ After all CoD steps and all three DETAILED REFLECTION blocks (and the optional b
       if (maxTokens) {
         MAX_TOKENS = parseInt(maxTokens); 
       } else {
-        MAX_TOKENS = 4096;
+        MAX_TOKENS = 8192;
       }
       
       const streaming = localStorage.getItem('streamingEnabled'); 

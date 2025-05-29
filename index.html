@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI Reasoning Studio - Minimal CoD (Qwen3-235B)</title>
+  <title>AI Reasoning Studio (Qwen3-235B)</title>
   
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -223,7 +223,7 @@
     <div class="flex-1 flex flex-col overflow-hidden">
       <!-- Header -->
       <header class="bg-dark-700 border-b border-dark-600 h-16 flex items-center justify-between px-4 md:px-6">
-        <h1 id="pageTitle" class="text-xl font-semibold">AI Reasoning Studio - Minimal CoD (Qwen3-235B)</h1>
+        <h1 id="pageTitle" class="text-xl font-semibold">AI Reasoning Studio (Qwen3-235B)</h1>
         <div class="flex items-center gap-3">
           <div id="currentModelDisplay" class="bg-dark-600 text-sm px-3 py-1.5 rounded-lg flex items-center">
             <span>Qwen3-235B (Fireworks AI)</span>
@@ -311,23 +311,33 @@
               <div class="flex items-start">
                 <input type="radio" id="codReasoning" name="reasoningMethod" value="cod" checked class="w-4 h-4 mt-1 text-primary-500 bg-dark-500 border-dark-400 focus:ring-primary-500 focus:ring-offset-dark-700">
                 <label for="codReasoning" class="ml-3 block text-sm font-medium text-white">
-                  Minimal Chain of Draft (1-5 Steps + Reflections)
-                  <div class="text-gray-400 text-xs mt-1">Uses ONLY 1-5 CoD steps maximum, with 1-2 focused reflections, and a detailed final answer.</div>
+                  Chain of Draft (CoD) with Detailed Reflections
+                  <div class="text-gray-400 text-xs mt-1">Uses minimal words per CoD step, interspersed with 3 detailed reflections (no word limit), and a detailed final answer.</div>
                 </label>
               </div>
             </div>
           </div>
           
           <div id="codOptions" class="mb-5">
-            <h4 class="text-sm font-medium text-gray-300 mb-2">Minimal Chain of Draft Configuration:</h4>
+            <h4 class="text-sm font-medium text-gray-300 mb-3">Chain of Draft Configuration:</h4>
+            
+            <!-- CoD Word Count Slider -->
+            <div class="bg-dark-600 border border-dark-500 rounded-lg p-4 mb-4">
+              <div class="flex justify-between items-center mb-2">
+                <label for="codWordCount" class="block text-sm font-medium text-gray-300">CoD Step Word Count</label>
+                <span id="codWordCountValue" class="text-sm text-primary-400 font-medium">12</span>
+              </div>
+              <input type="range" id="codWordCount" min="2" max="20" step="1" value="12" class="w-full h-2 rounded-lg appearance-none cursor-pointer mb-2">
+              <p class="text-xs text-gray-400">Controls how many words each Chain of Draft step should target (2-20 words).</p>
+            </div>
+            
             <div class="bg-dark-600 border border-dark-500 rounded-lg p-3">
                 <p class="text-xs text-gray-400">
-                    Minimal Chain of Draft (CoD) is configured to instruct the model to:
+                    Chain of Draft (CoD) is configured to instruct the model to:
                     <ul class="list-disc list-inside ml-4 mt-1">
-                        <li>Use ONLY 1-5 CoD steps maximum (15-25 words each).</li>
-                        <li>Insert 1-2 "Detailed Reflection:" blocks during thinking (no word limit).</li>
+                        <li>Use concise CoD steps (target word count adjustable above).</li>
+                        <li>Insert 3 "Detailed Reflection X:" blocks during thinking (no word limit).</li>
                         <li>Provide a comprehensive final answer.</li>
-                        <li>Be extremely concise and focused in reasoning.</li>
                     </ul>
                 </p>
             </div>
@@ -343,23 +353,22 @@
           
           <div id="selfReflectionInfo" class="bg-dark-600 border border-dark-500 rounded-lg p-4 mb-5">
             <p class="text-gray-400 text-sm mb-3">
-              If enabled, adds a *brief* (15-25 words) final self-check reflection (starting with "Reflection:") just before the CoD final answer. This is in addition to the 1-2 detailed reflections.
+              If enabled, adds a *brief* final self-check reflection (starting with "Reflection:") just before the CoD final answer. This is in addition to the three detailed reflections.
             </p>
             <div class="bg-dark-700 rounded-lg p-4">
               <div class="flex items-center text-purple-300 text-sm font-medium mb-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
-                How Minimal CoD with Reflections Works
+                How CoD with Reflections Works
               </div>
               <div class="text-gray-400 text-xs">
-                When using Minimal Chain of Draft:
+                When using Chain of Draft:
                 <ul class="list-disc list-inside mt-2 space-y-1">
-                  <li>Model uses ONLY 1-5 concise CoD steps (15-25 words each).</li>
-                  <li>Model intersperses 1-2 "DETAILED REFLECTION:" blocks (verbose, no word limit) during its thinking.</li>
+                  <li>Model uses concise CoD steps (word count adjustable above).</li>
+                  <li>Model intersperses 3 "DETAILED REFLECTION X:" blocks (verbose, no word limit) during its thinking.</li>
                   <li>If "Final Brief Self-Reflection" is enabled, model adds one short "Reflection:" step before the final answer.</li>
                   <li>The final answer (after `####`) is comprehensive and detailed.</li>
-                  <li>Focus is on extreme conciseness while maintaining reasoning quality.</li>
                 </ul>
               </div>
             </div>
@@ -502,6 +511,7 @@
 
     let REASONING_METHOD = "cod";
     let SELF_REFLECTION_ENABLED = true;
+    let COD_WORD_COUNT = 12; // New: CoD word count setting
     
     let TEMPERATURE = 0.6;
     let TOP_P = 1;
@@ -602,9 +612,9 @@
         return; 
       }
       
-      let content = `AI Reasoning Studio - Minimal CoD - ${REASONING_METHOD.toUpperCase()}`;
+      let content = `AI Reasoning Studio - ${REASONING_METHOD.toUpperCase()}`;
       if (REASONING_METHOD === "cod") { 
-        content += ` (1-5 Steps + Reflections Mode)`; 
+        content += ` (CoD Word Count: ${COD_WORD_COUNT}, Detailed Reflections Mode)`; 
       }
       content += `\nModel: ${FIREWORKS_MODEL}\n\n`;
       
@@ -791,7 +801,7 @@
         const length = cleanedThinking.length;
 
         const findNextMarkerInfo = (text, pos) => {
-          const drRegex = /DETAILED REFLECTION\s*(\d*)\s*:/gi;
+          const drRegex = /DETAILED REFLECTION\s*(\d+)\s*:/gi;
           const frRegex = SELF_REFLECTION_ENABLED ? /Reflection:/gi : null; 
 
           drRegex.lastIndex = 0; 
@@ -813,7 +823,7 @@
               type: 'detailed_reflection', 
               index: drPos, 
               markerText: drMatch[0], 
-              number: drMatch[1] || '', 
+              number: drMatch[1], 
               endOfMarker: drPos + drMatch[0].length 
             };
           } else if (frPos < drPos) { 
@@ -930,7 +940,7 @@
               
               const thinkingLabel = document.createElement("div");
               thinkingLabel.className = "text-xs uppercase tracking-wider font-semibold text-gray-400 mb-3 pb-2 border-b border-dark-500";
-              thinkingLabel.textContent = "Minimal Chain of Draft & Reflections (1-5 Steps)";
+              thinkingLabel.textContent = "Chain of Draft & Reflections";
               thinkingContainer.appendChild(thinkingLabel);
               
               const thinkingContentDiv = document.createElement("div");
@@ -1498,43 +1508,59 @@
           updateCoDPrompt(); 
         }); 
       }
+
+      // Add CoD Word Count slider listener
+      const codWordCountSlider = document.getElementById('codWordCount');
+      if (codWordCountSlider) {
+        codWordCountSlider.addEventListener('input', () => {
+          COD_WORD_COUNT = parseInt(codWordCountSlider.value);
+          const valueDisplay = document.getElementById('codWordCountValue');
+          if (valueDisplay) valueDisplay.textContent = COD_WORD_COUNT;
+          updateRangeColor(codWordCountSlider);
+          updateCoDPrompt(); // Update the prompt when word count changes
+        });
+      }
     }
 
     function updateCoDPrompt() {
-      let basePrompt = `You are an AI assistant. Your goal is to solve problems by thinking step-by-step using MINIMAL Chain of Draft (CoD).
+      let basePrompt = `You are an AI assistant. Your goal is to solve problems by thinking step-by-step.
+When using Chain of Draft (CoD), adhere to the following structure for the thinking part of your response (before the '####' separator):
 
-When using Minimal Chain of Draft (CoD), adhere to the following structure for the thinking part of your response (before the '####' separator):
-
-1. **MAXIMUM 1-5 CoD Steps:** Use ONLY 1-5 concise CoD steps maximum (target 15-25 words per step). Separate each CoD step with a period. Use mathematical notation where possible. Focus on the most essential calculations and key intermediate results only.
-
-2. **1-2 Detailed Reflections:** After a few CoD steps, or at critical decision points, insert 1-2 "DETAILED REFLECTION:" blocks (no numbering required, just "DETAILED REFLECTION:").
-   * These "DETAILED REFLECTION" blocks are for thorough examination of your reasoning so far. They are NOT bound by the 15-25 word limit.
-   * In these blocks, verify calculations, discuss potential issues, assess confidence, and outline remaining sub-goals.
-   * Resume concise CoD steps after each detailed reflection.
-
-3. **Extreme Conciseness:** Be extremely focused and concise. Only include the most essential steps. Skip obvious or trivial intermediate steps.
+1.  **Concise CoD Steps:** Use very short, concise steps (target ${COD_WORD_COUNT} words per step). Separate each CoD step with a period. Use mathematical notation where possible. Focus on key calculations and essential intermediate results.
+2.  **Detailed Reflections:** After a few CoD steps, or before/after a critical calculation or decision point, insert a "DETAILED REFLECTION X:" block (where X is 1, 2, or 3). You must include exactly three such detailed reflection blocks.
+    *   These "DETAILED REFLECTION" blocks are for a more thorough, verbose examination of your reasoning so far. They are NOT bound by the ${COD_WORD_COUNT} word limit.
+    *   In these blocks, explain your checks, verify intermediate results, discuss potential pitfalls, assess your confidence, and outline sub-goals.
+    *   Resume concise CoD steps after each detailed reflection.
 
 Example structure of the thinking part:
-CoD Step 1. CoD Step 2.
-DETAILED REFLECTION: [In this section, I will perform a detailed check of the work done in steps 1-2. I've calculated A. I need to ensure this is correct before proceeding to B. My confidence in A is high because it's straightforward. The next step involves using A to find B, which is the primary objective.]
-CoD Step 3. CoD Step 4.
-DETAILED REFLECTION: [Here I'll review steps 3-4. I have B. Is this value reasonable? Are there edge cases I missed? I will verify the units. All calculations appear consistent. I'm ready to conclude.]`;
+CoD Step 1. CoD Step 2. CoD Step 3.
+DETAILED REFLECTION 1: [In this section, I will perform a detailed check of the work done in steps 1-3. I've calculated A and B. I need to ensure these are correct before proceeding to C. My confidence in A is high because it's a direct interpretation. B involved a multi-step calculation, so I'll double check that: (re-calculation or alternative check). My next sub-goal is to combine A and B to find D.]
+CoD Step 4. CoD Step 5.
+DETAILED REFLECTION 2: [Here, I'll review steps 4 and 5. I've found D. Is this value reasonable in the context of the problem? Are there any edge cases I missed for D? I will verify the units. The next step involves using D to calculate E, which is the primary objective.]
+CoD Step 6. CoD Step 7.
+DETAILED REFLECTION 3: [This is my final detailed review before concluding the thinking phase. I have E. I will quickly re-scan all CoD steps and previous detailed reflections. Step 1 was X. Step 2 was Y. Reflection 1 confirmed Z. Step 4 was P. Reflection 2 confirmed Q. All seems consistent. I am now ready to formulate the final answer.]
+`;
 
       const examplesCoDSteps = `
-Examples of minimal CoD steps (ONLY 1-5 steps total):
+Some examples of individual concise CoD steps (NOT detailed reflections):
 Example Problem 1: Jason had 20 lollipops. He gave Denny some. Now Jason has 12. How many did he give?
-CoD Step 1: Lollipops given = Initial - Remaining = 20 - 12 = 8.
+CoD Step: Initial lollipops: 20.
+CoD Step: Remaining lollipops: 12.
+CoD Step: Lollipops given: 20 - 12 = 8.
 
 Example Problem 2: Roger has $125. Spends $55. Receives $25. How much now?
-CoD Step 1: After spending: $125 - $55 = $70.
-CoD Step 2: After receiving: $70 + $25 = $95.
+CoD Step: Starting money: $125.
+CoD Step: Spent on game: $55.
+CoD Step: Money after spending: $125 - $55 = $70.
+CoD Step: Birthday money received: $25.
+CoD Step: Final money: $70 + $25 = $95.
 `;
 
       let finalAnswerInstruction = `
-After all CoD steps and 1-2 DETAILED REFLECTION blocks (and the optional brief final reflection, if applicable), write your final answer after the '####' separator. This final answer must be comprehensive and detailed, fully explaining the solution, the steps taken, and the reasoning behind them. Do not be brief in the final answer.`;
+After all CoD steps and all three DETAILED REFLECTION blocks (and the optional brief final reflection, if applicable), write your final answer after the '####' separator. This final answer must be comprehensive and detailed, fully explaining the solution, the steps taken, and the reasoning behind them. Do not be brief in the final answer.`;
 
       if (SELF_REFLECTION_ENABLED) { 
-        basePrompt += `\nJust before the '####' separator (after all CoD steps and DETAILED REFLECTION blocks), add a very brief final self-check reflection starting with 'Reflection:'. This final brief reflection should be concise (around 15-25 words), e.g., "Reflection: All calculations verified, approach is sound, answer is logical."`;
+        basePrompt += `\nJust before the '####' separator (after all CoD steps and all three DETAILED REFLECTION blocks), add a very brief final self-check reflection starting with 'Reflection:'. This final brief reflection should be concise (around ${COD_WORD_COUNT} words), e.g., "Reflection: All calculations checked, units are consistent, answer seems logical."`;
       }
       
       PROMPTS.cod = basePrompt + examplesCoDSteps + finalAnswerInstruction;
@@ -1602,6 +1628,7 @@ After all CoD steps and 1-2 DETAILED REFLECTION blocks (and the optional brief f
       setSliderAndValue("maxTokens", MAX_TOKENS); 
       setSliderAndValue("presencePenalty", PRESENCE_PENALTY); 
       setSliderAndValue("frequencyPenalty", FREQUENCY_PENALTY);
+      setSliderAndValue("codWordCount", COD_WORD_COUNT); // Add CoD word count slider
       
       setupCODOptionsDisplay(); 
       setupMcpToolsOptions();
@@ -1665,6 +1692,10 @@ After all CoD steps and 1-2 DETAILED REFLECTION blocks (and the optional brief f
       
       const selfReflectionToggle = document.getElementById('selfReflectionToggle'); 
       if (selfReflectionToggle) SELF_REFLECTION_ENABLED = selfReflectionToggle.checked;
+
+      // Save CoD word count setting
+      const codWordCountSlider = document.getElementById('codWordCount');
+      if (codWordCountSlider) COD_WORD_COUNT = parseInt(codWordCountSlider.value);
       
       TEMPERATURE = parseFloat(document.getElementById("temp").value); 
       if (TEMPERATURE === 0 && document.getElementById("temp").min === "0") TEMPERATURE = 0.01;
@@ -1687,6 +1718,7 @@ After all CoD steps and 1-2 DETAILED REFLECTION blocks (and the optional brief f
       
       localStorage.setItem("reasoningMethod", REASONING_METHOD); 
       localStorage.setItem("selfReflectionEnabled", SELF_REFLECTION_ENABLED.toString()); 
+      localStorage.setItem("codWordCount", COD_WORD_COUNT.toString()); // Save CoD word count
       localStorage.setItem("temperature", TEMPERATURE.toString()); 
       localStorage.setItem("topP", TOP_P.toString()); 
       localStorage.setItem("topK", TOP_K.toString()); 
@@ -1776,6 +1808,14 @@ After all CoD steps and 1-2 DETAILED REFLECTION blocks (and the optional brief f
         SELF_REFLECTION_ENABLED = selfReflection === "true"; 
       } else {
         SELF_REFLECTION_ENABLED = true; 
+      }
+
+      // Load CoD word count setting
+      const codWordCount = localStorage.getItem("codWordCount");
+      if (codWordCount) {
+        COD_WORD_COUNT = parseInt(codWordCount);
+      } else {
+        COD_WORD_COUNT = 12; // Default value
       }
       
       const temp = localStorage.getItem("temperature"); 
@@ -1934,3 +1974,4 @@ After all CoD steps and 1-2 DETAILED REFLECTION blocks (and the optional brief f
   </script>
 </body>
 </html>
+<script async data-explicit-opt-in="true" data-cookie-opt-in="true" data-deployment-id="dpl_88wsXq63nUY8dNspBNvuDtvcaKZr" src="https://vercel.live/_next-live/feedback/feedback.js"></script>

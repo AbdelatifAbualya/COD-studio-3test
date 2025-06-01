@@ -813,18 +813,29 @@
         let codStepCounter = 1;
         const length = cleanedThinking.length;
 
-        // Enhanced regex patterns for better embedded reflection detection
+        // Enhanced regex patterns for better marker detection
         const findNextMarkerInfo = (text, pos) => {
           const patterns = [
+            // Updated patterns for better matching
+            { 
+              regex: /\*\*(?:EMBEDDED\s+)?REFLECTION\s*(?:AFTER\s+(?:\d+\s+)?TOKENS?\s*)?(\d*):\*\*/gi, 
+              type: 'embedded_reflection', 
+              getName: (match) => match[1] ? `REFLECTION ${match[1]}:` : 'REFLECTION:' 
+            },
             { 
               regex: /\*\*REFLECTION\s*(\d+):\*\*/gi, 
               type: 'embedded_reflection', 
               getName: (match) => `REFLECTION ${match[1]}:` 
             },
             { 
-              regex: /\*\*DETAILED\s+REFLECTION\s*(\d+):\*\*/gi, 
+              regex: /\*\*TOKEN[_\s-]*BASED\s+REFLECTION\s*(\d*):\*\*/gi, 
               type: 'embedded_reflection', 
-              getName: (match) => `DETAILED REFLECTION ${match[1]}:` 
+              getName: (match) => match[1] ? `TOKEN-BASED REFLECTION ${match[1]}:` : 'TOKEN-BASED REFLECTION:' 
+            },
+            { 
+              regex: /\*\*DETAILED\s+REFLECTION\s*(\d*):\*\*/gi, 
+              type: 'embedded_reflection', 
+              getName: (match) => match[1] ? `DETAILED REFLECTION ${match[1]}:` : 'DETAILED REFLECTION:' 
             },
             { 
               regex: /\*\*META[_\s-]*ANALYSIS:\*\*/gi, 
@@ -837,7 +848,7 @@
               getName: () => 'REFLECTION SYNTHESIS:' 
             },
             { 
-              regex: /\*\*FINAL\s+COMPREHENSIVE\s+REFLECTION:\*\*/gi, 
+              regex: /\*\*FINAL\s+(?:COMPREHENSIVE\s+)?REFLECTION:\*\*/gi, 
               type: 'final_comprehensive', 
               getName: () => 'FINAL COMPREHENSIVE REFLECTION:' 
             }
@@ -870,17 +881,16 @@
           let nextMarker = findNextMarkerInfo(cleanedThinking, currentPosition);
           let segmentEnd = nextMarker ? nextMarker.index : length;
 
-          // Process CoD segment before reflection
+          // Process CoD segment
           const codSegment = cleanedThinking.substring(currentPosition, segmentEnd).trim();
           if (codSegment) {
-            // Handle the text more carefully - split by sentences rather than just periods
-            let sentences = codSegment.split(/(?<=[.!?])\s+(?=[A-Z])/);
-            
-            sentences.forEach((sentence, index) => {
-              let stepContent = sentence.trim();
-              if (stepContent && stepContent.length > 3) {
-                // Don't add period if it already has proper punctuation
-                if (!stepContent.match(/[.!?]$/)) {
+            // Enhanced step processing
+            let steps = codSegment.split(/\.(?=\s|$)/).filter(step => step.trim().length > 0);
+            steps.forEach(step => {
+              let stepContent = step.trim();
+              if (stepContent && stepContent.length > 1) {
+                // Add period back if it was split
+                if (!stepContent.endsWith('.') && !stepContent.endsWith('!') && !stepContent.endsWith('?')) {
                   stepContent += '.';
                 }
                 html += `<div class="flex items-start p-3 mb-2 rounded-lg bg-slate-800/30 thinking-step">
@@ -902,29 +912,54 @@
           
           const reflectionContent = cleanedThinking.substring(nextMarker.endOfMarker, reflectionContentEndPos).trim();
 
-          // Render reflection based on type with enhanced styling for embedded reflections
+          // Enhanced reflection rendering with proper styling
           if (nextMarker.type === 'embedded_reflection') {
-            html += `<div class="p-4 mb-4 rounded-lg bg-gradient-to-r from-indigo-900/40 to-blue-900/40 border-l-4 border-indigo-400 shadow-lg">
+            html += `<div class="p-4 mb-3 rounded-lg bg-gradient-to-r from-cyan-900/40 to-blue-900/40 border-l-4 border-cyan-400 shadow-lg embedded-reflection-step">
                        <div class="flex items-center mb-3">
-                         <div class="flex items-center justify-center w-6 h-6 mr-2 rounded-full bg-indigo-500 text-white text-xs font-bold">R</div>
-                         <div class="font-semibold text-indigo-300 text-sm uppercase tracking-wide">${nextMarker.markerText}</div>
+                         <div class="flex items-center justify-center w-6 h-6 mr-2 rounded-full bg-cyan-500/20 border border-cyan-400">
+                           <svg class="w-3 h-3 text-cyan-300" fill="currentColor" viewBox="0 0 20 20">
+                             <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"></path>
+                           </svg>
+                         </div>
+                         <div class="font-semibold text-cyan-300 text-sm">${nextMarker.markerText}</div>
                        </div>
-                       <div class="text-sm text-indigo-100 leading-relaxed bg-indigo-950/20 rounded p-3 border border-indigo-800/30">${transformMessage(reflectionContent)}</div>
-                     </div>`;
-          } else if (nextMarker.type === 'meta_analysis') {
-            html += `<div class="p-4 mb-3 rounded-lg bg-amber-900/30 border-l-4 border-amber-500 meta-analysis-step">
-                       <div class="font-semibold text-amber-300 mb-2">${nextMarker.markerText}</div>
-                       <div class="font-mono text-sm text-amber-200">${transformMessage(reflectionContent)}</div>
+                       <div class="font-mono text-sm text-cyan-100 leading-relaxed">${transformMessage(reflectionContent)}</div>
                      </div>`;
           } else if (nextMarker.type === 'reflection_synthesis') {
-            html += `<div class="p-4 mb-3 rounded-lg bg-purple-900/30 border-l-4 border-purple-500 synthesis-step">
-                       <div class="font-semibold text-purple-300 mb-2">${nextMarker.markerText}</div>
-                       <div class="font-mono text-sm text-purple-200">${transformMessage(reflectionContent)}</div>
+            html += `<div class="p-4 mb-3 rounded-lg bg-gradient-to-r from-purple-900/40 to-indigo-900/40 border-l-4 border-purple-500 shadow-lg synthesis-step">
+                       <div class="flex items-center mb-3">
+                         <div class="flex items-center justify-center w-6 h-6 mr-2 rounded-full bg-purple-500/20 border border-purple-400">
+                           <svg class="w-3 h-3 text-purple-300" fill="currentColor" viewBox="0 0 20 20">
+                             <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"></path>
+                           </svg>
+                         </div>
+                         <div class="font-semibold text-purple-300 text-sm">${nextMarker.markerText}</div>
+                       </div>
+                       <div class="font-mono text-sm text-purple-100 leading-relaxed">${transformMessage(reflectionContent)}</div>
                      </div>`;
           } else if (nextMarker.type === 'final_comprehensive') {
-            html += `<div class="p-4 mb-3 rounded-lg bg-emerald-900/30 border-l-4 border-emerald-500 final-reflection-step">
-                       <div class="font-semibold text-emerald-300 mb-2">${nextMarker.markerText}</div>
-                       <div class="font-mono text-sm text-emerald-200">${transformMessage(reflectionContent)}</div>
+            html += `<div class="p-4 mb-3 rounded-lg bg-gradient-to-r from-emerald-900/40 to-green-900/40 border-l-4 border-emerald-500 shadow-lg final-reflection-step">
+                       <div class="flex items-center mb-3">
+                         <div class="flex items-center justify-center w-6 h-6 mr-2 rounded-full bg-emerald-500/20 border border-emerald-400">
+                           <svg class="w-3 h-3 text-emerald-300" fill="currentColor" viewBox="0 0 20 20">
+                             <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                           </svg>
+                         </div>
+                         <div class="font-semibold text-emerald-300 text-sm">${nextMarker.markerText}</div>
+                       </div>
+                       <div class="font-mono text-sm text-emerald-100 leading-relaxed">${transformMessage(reflectionContent)}</div>
+                     </div>`;
+          } else if (nextMarker.type === 'meta_analysis') {
+            html += `<div class="p-4 mb-3 rounded-lg bg-gradient-to-r from-amber-900/40 to-orange-900/40 border-l-4 border-amber-500 shadow-lg meta-analysis-step">
+                       <div class="flex items-center mb-3">
+                         <div class="flex items-center justify-center w-6 h-6 mr-2 rounded-full bg-amber-500/20 border border-amber-400">
+                           <svg class="w-3 h-3 text-amber-300" fill="currentColor" viewBox="0 0 20 20">
+                             <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                           </svg>
+                         </div>
+                         <div class="font-semibold text-amber-300 text-sm">${nextMarker.markerText}</div>
+                       </div>
+                       <div class="font-mono text-sm text-amber-100 leading-relaxed">${transformMessage(reflectionContent)}</div>
                      </div>`;
           }
           
@@ -1589,87 +1624,112 @@
     }
 
     function updateCoDPrompt() {
-      let basePrompt = `🚨 **CRITICAL ALERT: YOU MUST EMBED REFLECTIONS THROUGHOUT - NOT AT THE END!** 🚨
+      let basePrompt = `You are an AI assistant specialized in solving complex problems through systematic reasoning.
 
-**TOKEN-BASED REFLECTION METHODOLOGY:**
-This is a MANDATORY process where you MUST insert reflections after every ~${REFLECTION_FREQUENCY} tokens during your reasoning, NOT at the end.
+**CRITICAL RULE: For hard math, code, or logic problems, you MUST embed reflections immediately after every ~${REFLECTION_FREQUENCY} tokens throughout your reasoning, NOT at the end!**
 
-**STEP-BY-STEP EXECUTION REQUIREMENTS:**
-1. Begin reasoning with CoD steps (${COD_WORD_COUNT} words each)
-2. Count every single word as you write: "1, 2, 3, 4, 5..."
-3. When you reach approximately ${REFLECTION_FREQUENCY} words, IMMEDIATELY STOP writing CoD
-4. Insert **REFLECTION 1:** and analyze what you just wrote
-5. Resume CoD reasoning from where you stopped
-6. Count the next ~${REFLECTION_FREQUENCY} words: "1, 2, 3, 4, 5..."
-7. When you reach ~${REFLECTION_FREQUENCY} again, IMMEDIATELY STOP
-8. Insert **REFLECTION 2:** and analyze the new chunk
-9. Continue this pattern until all reasoning is complete
-10. Only then add final reflections and answer
+**PROBLEM IDENTIFICATION:**
+When you encounter HARD MATH, CODE, or LOGIC problems (including but not limited to: complex calculations, multi-step algorithms, debugging code, proof-based reasoning, optimization problems, or any task requiring deep analytical thinking), automatically engage the following Advanced Chain of Draft methodology.
 
-**MANDATORY EMBEDDING PATTERN (YOU MUST FOLLOW THIS):**
+**ADVANCED CHAIN OF DRAFT (TOKEN-BASED REFLECTIONS) STRUCTURE:**
 
-Start → CoD reasoning (count: 1, 2, 3... ${REFLECTION_FREQUENCY}) → **REFLECTION 1:** → More CoD (count: 1, 2, 3... ${REFLECTION_FREQUENCY}) → **REFLECTION 2:** → Continue pattern...
+Your response MUST follow this exact structure for complex problems:
 
-**CRITICAL EXAMPLES:**
+1. **Token-Based CoD with IMMEDIATE Embedded Reflections:**
+   - Use concise CoD steps (target ${COD_WORD_COUNT} words per step)
+   - **CRITICAL**: After approximately every ${REFLECTION_FREQUENCY} tokens of CoD content, IMMEDIATELY insert a detailed reflection
+   - **NEVER save reflections for the end** - place each reflection immediately after the CoD chunk it analyzes
+   - Continue this pattern throughout your reasoning
 
-❌ ABSOLUTE WRONG PATTERN (DO NOT DO THIS):
-[Long reasoning section with 400+ tokens]
-**REFLECTION 1:** analysis
-**REFLECTION 2:** analysis  
-**REFLECTION 3:** analysis
-**FINAL COMPREHENSIVE REFLECTION:** analysis
+2. **MANDATORY Reflection Pattern (EMBED IMMEDIATELY):**
+   \`\`\`
+   CoD steps (continue until ~${REFLECTION_FREQUENCY} tokens)
+   **EMBEDDED REFLECTION AFTER ${REFLECTION_FREQUENCY} TOKENS 1:** [comprehensive analysis of preceding CoD chunk]
+   More CoD steps (continue until next ~${REFLECTION_FREQUENCY} tokens)  
+   **EMBEDDED REFLECTION AFTER ${REFLECTION_FREQUENCY} TOKENS 2:** [analysis of this new chunk]
+   Continue this pattern...
+   \`\`\`
 
-✅ MANDATORY CORRECT PATTERN (YOU MUST DO THIS):
-CoD step 1: Initial analysis... CoD step 2: Examine variables... CoD step 3: Calculate first component... [approximately ${REFLECTION_FREQUENCY} tokens]
+3. **Meta-Analysis Phase** (${META_ANALYSIS_ENABLED ? 'ENABLED' : 'DISABLED'}):
+   ${META_ANALYSIS_ENABLED ? `Before providing your final answer, conduct:
+   **META-ANALYSIS:** Review all previous EMBEDDED REFLECTION blocks
+   - Analyze connections, contradictions, and new insights between reflections
+   - Identify missed opportunities or alternative approaches
+   - Synthesize findings into new understanding` : ''}
 
-**REFLECTION 1:** The preceding chunk covered initial analysis through first component calculation. The approach is sound but I need to verify the calculation accuracy. The variables were correctly identified. Next I'll continue with remaining components.
+4. **Final Comprehensive Reflection:**
+   ${META_ANALYSIS_ENABLED ? 'After meta-analysis, provide:' : 'Before your final answer, provide:'}
+   **FINAL COMPREHENSIVE REFLECTION:** Deep analysis incorporating all insights${META_ANALYSIS_ENABLED ? ' from meta-analysis' : ''}
 
-CoD step 4: Calculate second component... CoD step 5: Cross-verify results... CoD step 6: Check edge cases... [approximately ${REFLECTION_FREQUENCY} more tokens]
+**DETAILED INSTRUCTIONS:**
 
-**REFLECTION 2:** This chunk focused on second component and verification. The cross-verification revealed a potential issue with edge case handling. I need to address this in the next reasoning chunk while continuing the calculation process.
+**CoD Steps (target ${COD_WORD_COUNT} words each):**
+- Use mathematical notation and formulas where applicable
+- Focus on key calculations and essential intermediate results  
+- Separate each step with a period
+- **Track your token usage mentally** - after ~${REFLECTION_FREQUENCY} tokens, IMMEDIATELY embed a reflection
 
-[Continue this pattern for all reasoning]
+**EMBEDDED REFLECTION [N] blocks (PLACE IMMEDIATELY after ~${REFLECTION_FREQUENCY} tokens of CoD):**
+- Format as: **EMBEDDED REFLECTION AFTER ${REFLECTION_FREQUENCY} TOKENS N:** [content]
+- Alternative formats: **TOKEN-BASED REFLECTION N:** or **REFLECTION N:**
+- NO word limit - be thorough and comprehensive
+- Analyze correctness of ALL steps in the preceding chunk
+- Verify calculations, logic, and intermediate results step-by-step
+- Check for potential errors, edge cases, or alternative approaches
+- Assess confidence levels and identify uncertainties
+- Note patterns, insights, or connections discovered
+- Outline what needs to be done next
+- Consider if current approach is optimal or if pivoting is needed
 
-**IMMEDIATE REFLECTION TRIGGERS:**
-- As soon as you hit ~${REFLECTION_FREQUENCY} tokens of CoD reasoning, STOP and insert **REFLECTION N:**
-- DO NOT continue reasoning without inserting the reflection first
-- Each reflection must be inserted IMMEDIATELY after its token chunk
-- NEVER batch all reflections at the end
+${META_ANALYSIS_ENABLED ? `**META-ANALYSIS (before final answer):**
+- Format as: **META-ANALYSIS:** [content]
+- Review ALL previous EMBEDDED REFLECTION blocks systematically
+- Look for:
+  * Consistent themes across reflections
+  * Contradictions that need resolution  
+  * Evolving understanding throughout the process
+  * Missed connections between different solution parts
+  * Alternative solution paths that emerged
+  * Areas where confidence was low and need verification
+- Synthesize insights into new understanding or approach refinements` : ''}
 
-**REFLECTION FORMAT REQUIREMENTS:**
-**REFLECTION N:** [Detailed analysis of the immediately preceding ~${REFLECTION_FREQUENCY} token chunk]
-- Review ALL steps in that specific chunk only
-- Identify any errors, gaps, or improvements needed
-- Note what insights were gained in that chunk
-- Outline what needs to happen in the next chunk
-- Rate confidence in the chunk's conclusions
-
-${META_ANALYSIS_ENABLED ? `**META-ANALYSIS:** (Only after all embedded reflections)
-- Synthesize insights from ALL previous embedded reflections
-- Identify patterns and connections between reflection insights
-- Note any contradictions or evolving understanding
-- Assess overall reasoning quality and coherence` : ''}
-
-**FINAL COMPREHENSIVE REFLECTION:** (Only at the very end)
-- Complete verification of the entire solution path
-- Integration of all embedded reflection insights${META_ANALYSIS_ENABLED ? ' and meta-analysis' : ''}
-- Final confidence assessment and solution validation
-
-**ABSOLUTE ENFORCEMENT RULES:**
-1. You CANNOT write more than ~${REFLECTION_FREQUENCY} tokens without inserting a reflection
-2. You MUST insert **REFLECTION N:** immediately when reaching token limit  
-3. You MUST continue reasoning after each embedded reflection
-4. Embedded reflections analyze ONLY their immediate preceding chunk
-5. Save comprehensive analysis for **FINAL COMPREHENSIVE REFLECTION:** only
-
-**TOKEN COUNTING DISCIPLINE:**
-Start counting immediately: "1-word, 2-words, 3-words..." as you write each CoD step. When you approach ${REFLECTION_FREQUENCY}, prepare to insert reflection. Do NOT exceed this limit without reflection insertion.
+**FINAL COMPREHENSIVE REFLECTION:**
+- Format as: **FINAL COMPREHENSIVE REFLECTION:** [content]
+- Conduct deep analysis incorporating all insights${META_ANALYSIS_ENABLED ? ' from meta-analysis' : ''}
+- Verify the complete solution path
+- Check for any remaining uncertainties or assumptions
+- Confirm the solution addresses all aspects of the original problem
 
 **After the '####' separator, provide your final detailed answer:**
 - Comprehensive explanation of the solution
 - Clear step-by-step walkthrough of the final approach
 - Justification for key decisions made during reasoning
 - Final verification that the solution is correct and complete
+
+**CRITICAL TOKEN TRACKING EXAMPLE:**
+Start CoD steps:
+"Initial problem setup. Container A has 8L water." [Track tokens: ~10]
+"Container B and C are empty initially." [Track tokens: ~20]
+"Goal: specific sequence of minimum pours." [Track tokens: ~30]
+"First pour: A→B until B full at 5L." [Track tokens: ~40]
+...continue counting...
+[When approaching ~${REFLECTION_FREQUENCY} tokens] 
+**EMBEDDED REFLECTION AFTER ${REFLECTION_FREQUENCY} TOKENS 1:** [Detailed analysis of above CoD chunk]
+...continue with more CoD steps and embed next reflection after another ~${REFLECTION_FREQUENCY} tokens...
+
+**FORMATTING RULES - CRITICAL FOR PROPER DISPLAY:**
+- All reflection markers MUST be bolded: **EMBEDDED REFLECTION AFTER ${REFLECTION_FREQUENCY} TOKENS N:**
+- Alternative acceptable formats: **TOKEN-BASED REFLECTION N:**, **REFLECTION N:**
+- **NEVER save reflections for the end** - embed them immediately after each ~${REFLECTION_FREQUENCY} token chunk
+- Each reflection should appear right after the CoD content it analyzes
+- Do NOT wait until you have written many CoD steps to start reflecting
+
+**TOKEN-BASED EMBEDDING STRATEGY:**
+1. Start your CoD reasoning
+2. Mentally count tokens/words as you write (~3-4 words per token typically)
+3. When you reach approximately ${REFLECTION_FREQUENCY} tokens, STOP and embed a reflection
+4. Continue with more CoD steps
+5. Repeat the embedding pattern throughout your reasoning
 
 **IMPORTANT:** Only use this methodology for genuinely complex problems requiring deep reasoning. For simple questions, respond normally without the CoD structure.`;
 

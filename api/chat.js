@@ -42,7 +42,7 @@ module.exports = async (req, res) => {
       messageCount: messages.length, 
       stream: !!stream,
       toolsEnabled: !!(tools && tools.length > 0),
-      isAdvancedCoD: messages.some(m => m.content?.includes('DETAILED REFLECTION') || m.content?.includes('TOKEN-BASED'))
+      isAdvancedCoD: messages.some(m => m.content?.includes('**REFLECTION') || m.content?.includes('TOKEN-BASED'))
     });
 
     // Prepare the request to Fireworks API

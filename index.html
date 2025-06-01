@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI Reasoning Studio (Qwen3-235B)</title>
+  <title>AI Reasoning Studio (Advanced CoD)</title>
   
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -99,7 +99,7 @@
     .thinking-steps {
       animation: fadeIn 0.3s ease;
     }
-    .thinking-step, .detailed-reflection-step, .reflection-step {
+    .thinking-step, .detailed-reflection-step, .reflection-step, .meta-analysis-step, .synthesis-step {
       animation: fadeIn 0.3s ease;
     }
     
@@ -223,7 +223,7 @@
     <div class="flex-1 flex flex-col overflow-hidden">
       <!-- Header -->
       <header class="bg-dark-700 border-b border-dark-600 h-16 flex items-center justify-between px-4 md:px-6">
-        <h1 id="pageTitle" class="text-xl font-semibold">AI Reasoning Studio (Qwen3-235B)</h1>
+        <h1 id="pageTitle" class="text-xl font-semibold">AI Reasoning Studio (Advanced CoD)</h1>
         <div class="flex items-center gap-3">
           <div id="currentModelDisplay" class="bg-dark-600 text-sm px-3 py-1.5 rounded-lg flex items-center">
             <span>Qwen3-235B (Fireworks AI)</span>
@@ -311,15 +311,15 @@
               <div class="flex items-start">
                 <input type="radio" id="codReasoning" name="reasoningMethod" value="cod" checked class="w-4 h-4 mt-1 text-primary-500 bg-dark-500 border-dark-400 focus:ring-primary-500 focus:ring-offset-dark-700">
                 <label for="codReasoning" class="ml-3 block text-sm font-medium text-white">
-                  Chain of Draft (CoD) with Detailed Reflections
-                  <div class="text-gray-400 text-xs mt-1">Uses minimal words per CoD step, interspersed with 3 detailed reflections (no word limit), and a detailed final answer.</div>
+                  Advanced Chain of Draft (Token-Based Reflections)
+                  <div class="text-gray-400 text-xs mt-1">Uses CoD with embedded reflections every ~150 tokens, plus meta-analysis and synthesis phases.</div>
                 </label>
               </div>
             </div>
           </div>
           
           <div id="codOptions" class="mb-5">
-            <h4 class="text-sm font-medium text-gray-300 mb-3">Chain of Draft Configuration:</h4>
+            <h4 class="text-sm font-medium text-gray-300 mb-3">Advanced CoD Configuration:</h4>
             
             <!-- CoD Word Count Slider -->
             <div class="bg-dark-600 border border-dark-500 rounded-lg p-4 mb-4">
@@ -330,45 +330,58 @@
               <input type="range" id="codWordCount" min="2" max="20" step="1" value="12" class="w-full h-2 rounded-lg appearance-none cursor-pointer mb-2">
               <p class="text-xs text-gray-400">Controls how many words each Chain of Draft step should target (2-20 words).</p>
             </div>
+
+            <!-- Reflection Frequency Slider -->
+            <div class="bg-dark-600 border border-dark-500 rounded-lg p-4 mb-4">
+              <div class="flex justify-between items-center mb-2">
+                <label for="reflectionFrequency" class="block text-sm font-medium text-gray-300">Reflection Frequency (Tokens)</label>
+                <span id="reflectionFrequencyValue" class="text-sm text-primary-400 font-medium">150</span>
+              </div>
+              <input type="range" id="reflectionFrequency" min="50" max="300" step="25" value="150" class="w-full h-2 rounded-lg appearance-none cursor-pointer mb-2">
+              <p class="text-xs text-gray-400">How many tokens of CoD before triggering a detailed reflection (50-300 tokens).</p>
+            </div>
             
             <div class="bg-dark-600 border border-dark-500 rounded-lg p-3">
                 <p class="text-xs text-gray-400">
-                    Chain of Draft (CoD) is configured to instruct the model to:
+                    Advanced Chain of Draft (Token-Based) methodology:
                     <ul class="list-disc list-inside ml-4 mt-1">
-                        <li>Use concise CoD steps (target word count adjustable above).</li>
-                        <li>Insert 3 "Detailed Reflection X:" blocks during thinking (no word limit).</li>
-                        <li>Provide a comprehensive final answer.</li>
+                        <li>Use concise CoD steps (adjustable word count above)</li>
+                        <li>Insert detailed reflection after every ~150 tokens (adjustable above)</li>
+                        <li>Place reflections immediately after each CoD chunk</li>
+                        <li>Conduct meta-analysis of all reflections before final answer</li>
+                        <li>Provide comprehensive synthesis and final reflection</li>
                     </ul>
                 </p>
             </div>
           </div>
           
           <div class="flex justify-between items-center mb-4 pb-2 border-b border-dark-600">
-            <h3 class="text-lg font-medium">Enable Final Brief Self-Reflection (for CoD)</h3>
+            <h3 class="text-lg font-medium">Enable Meta-Analysis Phase</h3>
             <label class="relative inline-flex items-center cursor-pointer">
-              <input type="checkbox" id="selfReflectionToggle" class="sr-only peer" checked>
+              <input type="checkbox" id="metaAnalysisToggle" class="sr-only peer" checked>
               <div class="w-11 h-6 bg-dark-500 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
             </label>
           </div>
           
-          <div id="selfReflectionInfo" class="bg-dark-600 border border-dark-500 rounded-lg p-4 mb-5">
+          <div id="metaAnalysisInfo" class="bg-dark-600 border border-dark-500 rounded-lg p-4 mb-5">
             <p class="text-gray-400 text-sm mb-3">
-              If enabled, adds a *brief* final self-check reflection (starting with "Reflection:") just before the CoD final answer. This is in addition to the three detailed reflections.
+              If enabled, conducts deep analysis of all previous reflections before providing the final answer, looking for new insights and connections.
             </p>
             <div class="bg-dark-700 rounded-lg p-4">
               <div class="flex items-center text-purple-300 text-sm font-medium mb-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
-                How CoD with Reflections Works
+                How Advanced CoD Works
               </div>
               <div class="text-gray-400 text-xs">
-                When using Chain of Draft:
+                When using Advanced Chain of Draft:
                 <ul class="list-disc list-inside mt-2 space-y-1">
-                  <li>Model uses concise CoD steps (word count adjustable above).</li>
-                  <li>Model intersperses 3 "DETAILED REFLECTION X:" blocks (verbose, no word limit) during its thinking.</li>
-                  <li>If "Final Brief Self-Reflection" is enabled, model adds one short "Reflection:" step before the final answer.</li>
-                  <li>The final answer (after `####`) is comprehensive and detailed.</li>
+                  <li>Model identifies hard math/code/logic problems automatically</li>
+                  <li>Uses concise CoD steps with configurable word count</li>
+                  <li>Embeds detailed reflections every ~150 tokens (configurable)</li>
+                  <li>Conducts meta-analysis reviewing all reflections</li>
+                  <li>Provides comprehensive final reflection before detailed answer</li>
                 </ul>
               </div>
             </div>
@@ -510,8 +523,9 @@
     };
 
     let REASONING_METHOD = "cod";
-    let SELF_REFLECTION_ENABLED = true;
-    let COD_WORD_COUNT = 12; // New: CoD word count setting
+    let META_ANALYSIS_ENABLED = true;
+    let COD_WORD_COUNT = 12;
+    let REFLECTION_FREQUENCY = 150; // New: token frequency for reflections
     
     let TEMPERATURE = 0.6;
     let TOP_P = 1;
@@ -612,9 +626,9 @@
         return; 
       }
       
-      let content = `AI Reasoning Studio - ${REASONING_METHOD.toUpperCase()}`;
+      let content = `AI Reasoning Studio - Advanced ${REASONING_METHOD.toUpperCase()}`;
       if (REASONING_METHOD === "cod") { 
-        content += ` (CoD Word Count: ${COD_WORD_COUNT}, Detailed Reflections Mode)`; 
+        content += ` (CoD Word Count: ${COD_WORD_COUNT}, Reflection Frequency: ${REFLECTION_FREQUENCY} tokens)`; 
       }
       content += `\nModel: ${FIREWORKS_MODEL}\n\n`;
       
@@ -801,40 +815,34 @@
         const length = cleanedThinking.length;
 
         const findNextMarkerInfo = (text, pos) => {
+          // Updated regex patterns for the new reflection system
           const drRegex = /DETAILED REFLECTION\s*(\d+)\s*:/gi;
-          const frRegex = SELF_REFLECTION_ENABLED ? /Reflection:/gi : null; 
+          const rsRegex = /REFLECTION SYNTHESIS\s*:/gi;
+          const fcRegex = /FINAL COMPREHENSIVE REFLECTION\s*:/gi;
+          const maRegex = /META-ANALYSIS\s*:/gi;
 
-          drRegex.lastIndex = 0; 
+          // Reset regex lastIndex
+          drRegex.lastIndex = 0;
+          rsRegex.lastIndex = 0;
+          fcRegex.lastIndex = 0;
+          maRegex.lastIndex = 0;
+          
           let drMatch = drRegex.exec(text.substring(pos));
+          let rsMatch = rsRegex.exec(text.substring(pos));
+          let fcMatch = fcRegex.exec(text.substring(pos));
+          let maMatch = maRegex.exec(text.substring(pos));
           
-          let frMatch = null;
-          if (frRegex) {
-            frRegex.lastIndex = 0; 
-            frMatch = frRegex.exec(text.substring(pos));
-          }
+          let matches = [];
+          if (drMatch) matches.push({ type: 'detailed_reflection', index: drMatch.index + pos, markerText: drMatch[0], number: drMatch[1], endOfMarker: drMatch.index + pos + drMatch[0].length });
+          if (rsMatch) matches.push({ type: 'reflection_synthesis', index: rsMatch.index + pos, markerText: rsMatch[0], endOfMarker: rsMatch.index + pos + rsMatch[0].length });
+          if (fcMatch) matches.push({ type: 'final_comprehensive', index: fcMatch.index + pos, markerText: fcMatch[0], endOfMarker: fcMatch.index + pos + fcMatch[0].length });
+          if (maMatch) matches.push({ type: 'meta_analysis', index: maMatch.index + pos, markerText: maMatch[0], endOfMarker: maMatch.index + pos + maMatch[0].length });
+
+          if (matches.length === 0) return null;
           
-          let drPos = drMatch ? drMatch.index + pos : Infinity;
-          let frPos = frMatch ? frMatch.index + pos : Infinity;
-
-          if (drPos === Infinity && frPos === Infinity) return null;
-
-          if (drPos < frPos) {
-            return { 
-              type: 'detailed_reflection', 
-              index: drPos, 
-              markerText: drMatch[0], 
-              number: drMatch[1], 
-              endOfMarker: drPos + drMatch[0].length 
-            };
-          } else if (frPos < drPos) { 
-            return { 
-              type: 'final_reflection', 
-              index: frPos, 
-              markerText: frMatch[0], 
-              endOfMarker: frPos + frMatch[0].length 
-            };
-          }
-          return null; 
+          // Return the earliest match
+          matches.sort((a, b) => a.index - b.index);
+          return matches[0];
         };
 
         while (currentPosition < length) {
@@ -846,10 +854,12 @@
             let steps = codSegment.split('.').filter(step => step.trim().length > 0);
             steps.forEach(step => {
               let stepContent = step.trim();
-              html += `<div class="flex items-start p-3 mb-2 rounded-lg bg-slate-800/30 thinking-step">
-                         <span class="flex items-center justify-center min-w-8 h-8 mr-3 rounded-full bg-slate-700 text-primary-400 text-sm font-bold step-number">${codStepCounter++}</span>
-                         <span class="step-content font-mono text-sm">${stepContent}.</span>
-                       </div>`;
+              if (stepContent) {
+                html += `<div class="flex items-start p-3 mb-2 rounded-lg bg-slate-800/30 thinking-step">
+                           <span class="flex items-center justify-center min-w-8 h-8 mr-3 rounded-full bg-slate-700 text-primary-400 text-sm font-bold step-number">${codStepCounter++}</span>
+                           <span class="step-content font-mono text-sm">${stepContent}.</span>
+                         </div>`;
+              }
             });
           }
 
@@ -868,11 +878,21 @@
                        <div class="font-semibold text-sky-300 mb-2">${nextMarker.markerText}</div>
                        <div class="font-mono text-sm text-sky-200">${transformMessage(reflectionContent)}</div>
                      </div>`;
-          } else if (nextMarker.type === 'final_reflection') {
-            html += `<div class="flex items-start p-3 mb-2 rounded-lg bg-indigo-900/20 border-l-4 border-indigo-500 reflection-step">
-                      <span class="flex items-center justify-center min-w-8 h-8 mr-3 rounded-full bg-indigo-700/50 text-indigo-300 text-sm font-bold step-number">🔍</span>
-                      <span class="step-content font-mono text-sm text-indigo-300">${nextMarker.markerText} ${transformMessage(reflectionContent)}</span>
-                    </div>`;
+          } else if (nextMarker.type === 'reflection_synthesis') {
+            html += `<div class="p-4 mb-3 rounded-lg bg-purple-900/30 border-l-4 border-purple-500 synthesis-step">
+                       <div class="font-semibold text-purple-300 mb-2">${nextMarker.markerText}</div>
+                       <div class="font-mono text-sm text-purple-200">${transformMessage(reflectionContent)}</div>
+                     </div>`;
+          } else if (nextMarker.type === 'final_comprehensive') {
+            html += `<div class="p-4 mb-3 rounded-lg bg-emerald-900/30 border-l-4 border-emerald-500 final-reflection-step">
+                       <div class="font-semibold text-emerald-300 mb-2">${nextMarker.markerText}</div>
+                       <div class="font-mono text-sm text-emerald-200">${transformMessage(reflectionContent)}</div>
+                     </div>`;
+          } else if (nextMarker.type === 'meta_analysis') {
+            html += `<div class="p-4 mb-3 rounded-lg bg-amber-900/30 border-l-4 border-amber-500 meta-analysis-step">
+                       <div class="font-semibold text-amber-300 mb-2">${nextMarker.markerText}</div>
+                       <div class="font-mono text-sm text-amber-200">${transformMessage(reflectionContent)}</div>
+                     </div>`;
           }
           currentPosition = reflectionContentEndPos;
         }
@@ -940,7 +960,7 @@
               
               const thinkingLabel = document.createElement("div");
               thinkingLabel.className = "text-xs uppercase tracking-wider font-semibold text-gray-400 mb-3 pb-2 border-b border-dark-500";
-              thinkingLabel.textContent = "Chain of Draft & Reflections";
+              thinkingLabel.textContent = "Advanced Chain of Draft & Token-Based Reflections";
               thinkingContainer.appendChild(thinkingLabel);
               
               const thinkingContentDiv = document.createElement("div");
@@ -1119,7 +1139,7 @@
         attachedFilesContainer.classList.add('hidden'); 
       }
       
-      let placeholderText = "Thinking...";
+      let placeholderText = "Analyzing problem complexity...";
       addMessageToCurrentThread(placeholderText, "bot", true);
       const thread = threads.find(t => t.id === currentThreadId);
       const placeholderIndex = thread.messages.length - 1;
@@ -1501,10 +1521,10 @@
       updateDisplay(); 
       reasoningRadios.forEach(radio => radio.addEventListener('change', updateDisplay));
       
-      const selfReflectionToggle = document.getElementById('selfReflectionToggle');
-      if (selfReflectionToggle) { 
-        selfReflectionToggle.addEventListener('change', () => { 
-          SELF_REFLECTION_ENABLED = selfReflectionToggle.checked; 
+      const metaAnalysisToggle = document.getElementById('metaAnalysisToggle');
+      if (metaAnalysisToggle) { 
+        metaAnalysisToggle.addEventListener('change', () => { 
+          META_ANALYSIS_ENABLED = metaAnalysisToggle.checked; 
           updateCoDPrompt(); 
         }); 
       }
@@ -1517,53 +1537,107 @@
           const valueDisplay = document.getElementById('codWordCountValue');
           if (valueDisplay) valueDisplay.textContent = COD_WORD_COUNT;
           updateRangeColor(codWordCountSlider);
-          updateCoDPrompt(); // Update the prompt when word count changes
+          updateCoDPrompt();
+        });
+      }
+
+      // Add Reflection Frequency slider listener
+      const reflectionFrequencySlider = document.getElementById('reflectionFrequency');
+      if (reflectionFrequencySlider) {
+        reflectionFrequencySlider.addEventListener('input', () => {
+          REFLECTION_FREQUENCY = parseInt(reflectionFrequencySlider.value);
+          const valueDisplay = document.getElementById('reflectionFrequencyValue');
+          if (valueDisplay) valueDisplay.textContent = REFLECTION_FREQUENCY;
+          updateRangeColor(reflectionFrequencySlider);
+          updateCoDPrompt();
         });
       }
     }
 
     function updateCoDPrompt() {
-      let basePrompt = `You are an AI assistant. Your goal is to solve problems by thinking step-by-step.
-When using Chain of Draft (CoD), adhere to the following structure for the thinking part of your response (before the '####' separator):
+      let basePrompt = `You are an AI assistant specialized in solving complex problems through systematic reasoning.
 
-1.  **Concise CoD Steps:** Use very short, concise steps (target ${COD_WORD_COUNT} words per step). Separate each CoD step with a period. Use mathematical notation where possible. Focus on key calculations and essential intermediate results.
-2.  **Detailed Reflections:** After a few CoD steps, or before/after a critical calculation or decision point, insert a "DETAILED REFLECTION X:" block (where X is 1, 2, or 3). You must include exactly three such detailed reflection blocks.
-    *   These "DETAILED REFLECTION" blocks are for a more thorough, verbose examination of your reasoning so far. They are NOT bound by the ${COD_WORD_COUNT} word limit.
-    *   In these blocks, explain your checks, verify intermediate results, discuss potential pitfalls, assess your confidence, and outline sub-goals.
-    *   Resume concise CoD steps after each detailed reflection.
+**PROBLEM IDENTIFICATION:**
+When you encounter HARD MATH, CODE, or LOGIC problems (including but not limited to: complex calculations, multi-step algorithms, debugging code, proof-based reasoning, optimization problems, or any task requiring deep analytical thinking), automatically engage the following Advanced Chain of Draft methodology.
 
-Example structure of the thinking part:
-CoD Step 1. CoD Step 2. CoD Step 3.
-DETAILED REFLECTION 1: [In this section, I will perform a detailed check of the work done in steps 1-3. I've calculated A and B. I need to ensure these are correct before proceeding to C. My confidence in A is high because it's a direct interpretation. B involved a multi-step calculation, so I'll double check that: (re-calculation or alternative check). My next sub-goal is to combine A and B to find D.]
-CoD Step 4. CoD Step 5.
-DETAILED REFLECTION 2: [Here, I'll review steps 4 and 5. I've found D. Is this value reasonable in the context of the problem? Are there any edge cases I missed for D? I will verify the units. The next step involves using D to calculate E, which is the primary objective.]
-CoD Step 6. CoD Step 7.
-DETAILED REFLECTION 3: [This is my final detailed review before concluding the thinking phase. I have E. I will quickly re-scan all CoD steps and previous detailed reflections. Step 1 was X. Step 2 was Y. Reflection 1 confirmed Z. Step 4 was P. Reflection 2 confirmed Q. All seems consistent. I am now ready to formulate the final answer.]
-`;
+**ADVANCED CHAIN OF DRAFT (TOKEN-BASED REFLECTIONS) STRUCTURE:**
 
-      const examplesCoDSteps = `
-Some examples of individual concise CoD steps (NOT detailed reflections):
-Example Problem 1: Jason had 20 lollipops. He gave Denny some. Now Jason has 12. How many did he give?
-CoD Step: Initial lollipops: 20.
-CoD Step: Remaining lollipops: 12.
-CoD Step: Lollipops given: 20 - 12 = 8.
+Your response MUST follow this exact structure for complex problems:
 
-Example Problem 2: Roger has $125. Spends $55. Receives $25. How much now?
-CoD Step: Starting money: $125.
-CoD Step: Spent on game: $55.
-CoD Step: Money after spending: $125 - $55 = $70.
-CoD Step: Birthday money received: $25.
-CoD Step: Final money: $70 + $25 = $95.
-`;
+1. **Token-Based CoD with Embedded Reflections:**
+   - Use concise CoD steps (target ${COD_WORD_COUNT} words per step)
+   - After approximately every ${REFLECTION_FREQUENCY} tokens of CoD content, immediately insert a detailed reflection
+   - Place each reflection immediately after the CoD chunk it analyzes, NOT at the end
+   - Continue this pattern throughout your reasoning
 
-      let finalAnswerInstruction = `
-After all CoD steps and all three DETAILED REFLECTION blocks (and the optional brief final reflection, if applicable), write your final answer after the '####' separator. This final answer must be comprehensive and detailed, fully explaining the solution, the steps taken, and the reasoning behind them. Do not be brief in the final answer.`;
+2. **Reflection Pattern:**
+   CoD steps (continue until ~${REFLECTION_FREQUENCY} tokens)
+   DETAILED REFLECTION 1: [comprehensive analysis of preceding CoD chunk]
+   More CoD steps (continue until next ~${REFLECTION_FREQUENCY} tokens)  
+   DETAILED REFLECTION 2: [analysis of this new chunk]
+   Continue this pattern...
 
-      if (SELF_REFLECTION_ENABLED) { 
-        basePrompt += `\nJust before the '####' separator (after all CoD steps and all three DETAILED REFLECTION blocks), add a very brief final self-check reflection starting with 'Reflection:'. This final brief reflection should be concise (around ${COD_WORD_COUNT} words), e.g., "Reflection: All calculations checked, units are consistent, answer seems logical."`;
-      }
-      
-      PROMPTS.cod = basePrompt + examplesCoDSteps + finalAnswerInstruction;
+3. **Meta-Analysis Phase** (${META_ANALYSIS_ENABLED ? 'ENABLED' : 'DISABLED'}):
+   ${META_ANALYSIS_ENABLED ? `Before providing your final answer, conduct:
+   - REFLECTION SYNTHESIS: Review all previous DETAILED REFLECTION blocks
+   - Analyze connections, contradictions, and new insights between reflections
+   - Identify missed opportunities or alternative approaches
+   - Synthesize findings into new understanding` : ''}
+
+4. **Final Comprehensive Reflection:**
+   ${META_ANALYSIS_ENABLED ? 'After meta-analysis, provide:' : 'Before your final answer, provide:'}
+   - FINAL COMPREHENSIVE REFLECTION: Deep analysis incorporating all insights${META_ANALYSIS_ENABLED ? ' from meta-analysis' : ''}
+
+**DETAILED INSTRUCTIONS:**
+
+**CoD Steps (target ${COD_WORD_COUNT} words each):**
+- Use mathematical notation and formulas where applicable
+- Focus on key calculations and essential intermediate results  
+- Separate each step with a period
+- Track your token usage mentally to trigger reflections at ~${REFLECTION_FREQUENCY} token intervals
+
+**DETAILED REFLECTION [N] blocks (after ~${REFLECTION_FREQUENCY} tokens of CoD):**
+- NO word limit - be thorough and comprehensive
+- Analyze correctness of ALL steps in the preceding chunk
+- Verify calculations, logic, and intermediate results step-by-step
+- Check for potential errors, edge cases, or alternative approaches
+- Assess confidence levels and identify uncertainties
+- Note patterns, insights, or connections discovered
+- Outline what needs to be done next
+- Consider if current approach is optimal or if pivoting is needed
+
+${META_ANALYSIS_ENABLED ? `**REFLECTION SYNTHESIS (before final answer):**
+- Review ALL previous DETAILED REFLECTION blocks systematically
+- Look for:
+  * Consistent themes across reflections
+  * Contradictions that need resolution  
+  * Evolving understanding throughout the process
+  * Missed connections between different solution parts
+  * Alternative solution paths that emerged
+  * Areas where confidence was low and need verification
+- Synthesize insights into new understanding or approach refinements` : ''}
+
+**FINAL COMPREHENSIVE REFLECTION:**
+- Conduct deep analysis incorporating all insights${META_ANALYSIS_ENABLED ? ' from meta-analysis' : ''}
+- Verify the complete solution path
+- Check for any remaining uncertainties or assumptions
+- Confirm the solution addresses all aspects of the original problem
+
+**After the '####' separator, provide your final detailed answer:**
+- Comprehensive explanation of the solution
+- Clear step-by-step walkthrough of the final approach
+- Justification for key decisions made during reasoning
+- Final verification that the solution is correct and complete
+
+**Example Token Tracking:**
+- Start CoD steps
+- Count words/tokens mentally as you write
+- When approaching ~${REFLECTION_FREQUENCY} tokens, insert "DETAILED REFLECTION [N]:"
+- Continue this pattern throughout your reasoning
+
+**IMPORTANT:** Only use this methodology for genuinely complex problems requiring deep reasoning. For simple questions, respond normally without the CoD structure.`;
+
+      PROMPTS.cod = basePrompt;
     }
     
     function setupMcpToolsOptions() {
@@ -1619,8 +1693,8 @@ After all CoD steps and all three DETAILED REFLECTION blocks (and the optional b
       const reasoningRadio = document.getElementById(`${REASONING_METHOD}Reasoning`); 
       if (reasoningRadio) reasoningRadio.checked = true;
       
-      const selfReflectionToggle = document.getElementById('selfReflectionToggle'); 
-      if (selfReflectionToggle) selfReflectionToggle.checked = SELF_REFLECTION_ENABLED;
+      const metaAnalysisToggle = document.getElementById('metaAnalysisToggle'); 
+      if (metaAnalysisToggle) metaAnalysisToggle.checked = META_ANALYSIS_ENABLED;
       
       setSliderAndValue("temp", TEMPERATURE); 
       setSliderAndValue("topP", TOP_P); 
@@ -1628,7 +1702,8 @@ After all CoD steps and all three DETAILED REFLECTION blocks (and the optional b
       setSliderAndValue("maxTokens", MAX_TOKENS); 
       setSliderAndValue("presencePenalty", PRESENCE_PENALTY); 
       setSliderAndValue("frequencyPenalty", FREQUENCY_PENALTY);
-      setSliderAndValue("codWordCount", COD_WORD_COUNT); // Add CoD word count slider
+      setSliderAndValue("codWordCount", COD_WORD_COUNT);
+      setSliderAndValue("reflectionFrequency", REFLECTION_FREQUENCY);
       
       setupCODOptionsDisplay(); 
       setupMcpToolsOptions();
@@ -1690,12 +1765,14 @@ After all CoD steps and all three DETAILED REFLECTION blocks (and the optional b
         if (radio.checked) REASONING_METHOD = radio.value;
       }
       
-      const selfReflectionToggle = document.getElementById('selfReflectionToggle'); 
-      if (selfReflectionToggle) SELF_REFLECTION_ENABLED = selfReflectionToggle.checked;
+      const metaAnalysisToggle = document.getElementById('metaAnalysisToggle'); 
+      if (metaAnalysisToggle) META_ANALYSIS_ENABLED = metaAnalysisToggle.checked;
 
-      // Save CoD word count setting
       const codWordCountSlider = document.getElementById('codWordCount');
       if (codWordCountSlider) COD_WORD_COUNT = parseInt(codWordCountSlider.value);
+
+      const reflectionFrequencySlider = document.getElementById('reflectionFrequency');
+      if (reflectionFrequencySlider) REFLECTION_FREQUENCY = parseInt(reflectionFrequencySlider.value);
       
       TEMPERATURE = parseFloat(document.getElementById("temp").value); 
       if (TEMPERATURE === 0 && document.getElementById("temp").min === "0") TEMPERATURE = 0.01;
@@ -1717,8 +1794,9 @@ After all CoD steps and all three DETAILED REFLECTION blocks (and the optional b
       }
       
       localStorage.setItem("reasoningMethod", REASONING_METHOD); 
-      localStorage.setItem("selfReflectionEnabled", SELF_REFLECTION_ENABLED.toString()); 
-      localStorage.setItem("codWordCount", COD_WORD_COUNT.toString()); // Save CoD word count
+      localStorage.setItem("metaAnalysisEnabled", META_ANALYSIS_ENABLED.toString()); 
+      localStorage.setItem("codWordCount", COD_WORD_COUNT.toString());
+      localStorage.setItem("reflectionFrequency", REFLECTION_FREQUENCY.toString());
       localStorage.setItem("temperature", TEMPERATURE.toString()); 
       localStorage.setItem("topP", TOP_P.toString()); 
       localStorage.setItem("topK", TOP_K.toString()); 
@@ -1803,19 +1881,25 @@ After all CoD steps and all three DETAILED REFLECTION blocks (and the optional b
     function loadPersistedSettings() {
       REASONING_METHOD = localStorage.getItem("reasoningMethod") || "cod";
       
-      const selfReflection = localStorage.getItem("selfReflectionEnabled"); 
-      if (selfReflection !== null) {
-        SELF_REFLECTION_ENABLED = selfReflection === "true"; 
+      const metaAnalysis = localStorage.getItem("metaAnalysisEnabled"); 
+      if (metaAnalysis !== null) {
+        META_ANALYSIS_ENABLED = metaAnalysis === "true"; 
       } else {
-        SELF_REFLECTION_ENABLED = true; 
+        META_ANALYSIS_ENABLED = true; 
       }
 
-      // Load CoD word count setting
       const codWordCount = localStorage.getItem("codWordCount");
       if (codWordCount) {
         COD_WORD_COUNT = parseInt(codWordCount);
       } else {
-        COD_WORD_COUNT = 12; // Default value
+        COD_WORD_COUNT = 12;
+      }
+
+      const reflectionFrequency = localStorage.getItem("reflectionFrequency");
+      if (reflectionFrequency) {
+        REFLECTION_FREQUENCY = parseInt(reflectionFrequency);
+      } else {
+        REFLECTION_FREQUENCY = 150;
       }
       
       const temp = localStorage.getItem("temperature"); 
@@ -1974,4 +2058,3 @@ After all CoD steps and all three DETAILED REFLECTION blocks (and the optional b
   </script>
 </body>
 </html>
-<script async data-explicit-opt-in="true" data-cookie-opt-in="true" data-deployment-id="dpl_88wsXq63nUY8dNspBNvuDtvcaKZr" src="https://vercel.live/_next-live/feedback/feedback.js"></script>

@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
@@ -206,7 +205,7 @@
           </ul>
           <div class="space-y-2">
             <button id="mobileNewThreadBtn" class="w-full bg-primary-500 hover:bg-primary-600 text-white py-2 px-4 rounded-md transition flex items-center justify-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg xmlns="http://www.w3.svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
               </svg>
               New Thread
@@ -325,10 +324,10 @@
             <div class="bg-dark-600 border border-dark-500 rounded-lg p-4 mb-4">
               <div class="flex justify-between items-center mb-2">
                 <label for="codWordCount" class="block text-sm font-medium text-gray-300">CoD Step Word Count</label>
-                <span id="codWordCountValue" class="text-sm text-primary-400 font-medium">12</span>
+                <span id="codWordCountValue" class="text-sm text-primary-400 font-medium">5</span>
               </div>
-              <input type="range" id="codWordCount" min="2" max="20" step="1" value="12" class="w-full h-2 rounded-lg appearance-none cursor-pointer mb-2">
-              <p class="text-xs text-gray-400">Controls how many words each Chain of Draft step should target (2-20 words).</p>
+              <input type="range" id="codWordCount" min="2" max="12" step="1" value="5" class="w-full h-2 rounded-lg appearance-none cursor-pointer mb-2">
+              <p class="text-xs text-gray-400">Controls how many words each Chain of Draft step should target (2-12 words).</p>
             </div>
 
             <!-- Reflection Frequency Slider -->
@@ -337,8 +336,8 @@
                 <label for="reflectionFrequency" class="block text-sm font-medium text-gray-300">Reflection Frequency (Tokens)</label>
                 <span id="reflectionFrequencyValue" class="text-sm text-primary-400 font-medium">150</span>
               </div>
-              <input type="range" id="reflectionFrequency" min="50" max="300" step="25" value="150" class="w-full h-2 rounded-lg appearance-none cursor-pointer mb-2">
-              <p class="text-xs text-gray-400">How many tokens of CoD before triggering a detailed reflection (50-300 tokens).</p>
+              <input type="range" id="reflectionFrequency" min="100" max="300" step="25" value="150" class="w-full h-2 rounded-lg appearance-none cursor-pointer mb-2">
+              <p class="text-xs text-gray-400">How many tokens of CoD before triggering a detailed reflection (100-300 tokens).</p>
             </div>
             
             <div class="bg-dark-600 border border-dark-500 rounded-lg p-3">
@@ -524,8 +523,8 @@
 
     let REASONING_METHOD = "cod";
     let META_ANALYSIS_ENABLED = true;
-    let COD_WORD_COUNT = 12;
-    let REFLECTION_FREQUENCY = 150; // New: token frequency for reflections
+    let COD_WORD_COUNT = 5;
+    let REFLECTION_FREQUENCY = 150;
     
     let TEMPERATURE = 0.6;
     let TOP_P = 1;
@@ -814,29 +813,51 @@
         let codStepCounter = 1;
         const length = cleanedThinking.length;
 
+        // Updated regex patterns for better marker detection
         const findNextMarkerInfo = (text, pos) => {
-          // Updated regex patterns for the new reflection system
-          const drRegex = /DETAILED REFLECTION\s*(\d+)\s*:/gi;
-          const rsRegex = /REFLECTION SYNTHESIS\s*:/gi;
-          const fcRegex = /FINAL COMPREHENSIVE REFLECTION\s*:/gi;
-          const maRegex = /META-ANALYSIS\s*:/gi;
+          const patterns = [
+            { 
+              regex: /\*\*REFLECTION\s*(\d+):\*\*/gi, 
+              type: 'detailed_reflection', 
+              getName: (match) => `REFLECTION ${match[1]}:` 
+            },
+            { 
+              regex: /\*\*DETAILED\s+REFLECTION\s*(\d+):\*\*/gi, 
+              type: 'detailed_reflection', 
+              getName: (match) => `DETAILED REFLECTION ${match[1]}:` 
+            },
+            { 
+              regex: /\*\*META[_\s-]*ANALYSIS:\*\*/gi, 
+              type: 'meta_analysis', 
+              getName: () => 'META-ANALYSIS:' 
+            },
+            { 
+              regex: /\*\*REFLECTION\s+SYNTHESIS:\*\*/gi, 
+              type: 'reflection_synthesis', 
+              getName: () => 'REFLECTION SYNTHESIS:' 
+            },
+            { 
+              regex: /\*\*FINAL\s+COMPREHENSIVE\s+REFLECTION:\*\*/gi, 
+              type: 'final_comprehensive', 
+              getName: () => 'FINAL COMPREHENSIVE REFLECTION:' 
+            }
+          ];
 
-          // Reset regex lastIndex
-          drRegex.lastIndex = 0;
-          rsRegex.lastIndex = 0;
-          fcRegex.lastIndex = 0;
-          maRegex.lastIndex = 0;
-          
-          let drMatch = drRegex.exec(text.substring(pos));
-          let rsMatch = rsRegex.exec(text.substring(pos));
-          let fcMatch = fcRegex.exec(text.substring(pos));
-          let maMatch = maRegex.exec(text.substring(pos));
-          
           let matches = [];
-          if (drMatch) matches.push({ type: 'detailed_reflection', index: drMatch.index + pos, markerText: drMatch[0], number: drMatch[1], endOfMarker: drMatch.index + pos + drMatch[0].length });
-          if (rsMatch) matches.push({ type: 'reflection_synthesis', index: rsMatch.index + pos, markerText: rsMatch[0], endOfMarker: rsMatch.index + pos + rsMatch[0].length });
-          if (fcMatch) matches.push({ type: 'final_comprehensive', index: fcMatch.index + pos, markerText: fcMatch[0], endOfMarker: fcMatch.index + pos + fcMatch[0].length });
-          if (maMatch) matches.push({ type: 'meta_analysis', index: maMatch.index + pos, markerText: maMatch[0], endOfMarker: maMatch.index + pos + maMatch[0].length });
+          
+          patterns.forEach(pattern => {
+            pattern.regex.lastIndex = 0;
+            let match = pattern.regex.exec(text.substring(pos));
+            if (match) {
+              matches.push({ 
+                type: pattern.type, 
+                index: match.index + pos, 
+                markerText: pattern.getName(match), 
+                fullMatch: match[0],
+                endOfMarker: match.index + pos + match[0].length 
+              });
+            }
+          });
 
           if (matches.length === 0) return null;
           
@@ -849,15 +870,21 @@
           let nextMarker = findNextMarkerInfo(cleanedThinking, currentPosition);
           let segmentEnd = nextMarker ? nextMarker.index : length;
 
+          // Process CoD segment
           const codSegment = cleanedThinking.substring(currentPosition, segmentEnd).trim();
           if (codSegment) {
-            let steps = codSegment.split('.').filter(step => step.trim().length > 0);
+            // Split by periods and process as individual steps
+            let steps = codSegment.split(/\.(?=\s|$)/).filter(step => step.trim().length > 0);
             steps.forEach(step => {
               let stepContent = step.trim();
-              if (stepContent) {
+              if (stepContent && stepContent.length > 1) {
+                // Add period back if it was split
+                if (!stepContent.endsWith('.') && !stepContent.endsWith('!') && !stepContent.endsWith('?')) {
+                  stepContent += '.';
+                }
                 html += `<div class="flex items-start p-3 mb-2 rounded-lg bg-slate-800/30 thinking-step">
                            <span class="flex items-center justify-center min-w-8 h-8 mr-3 rounded-full bg-slate-700 text-primary-400 text-sm font-bold step-number">${codStepCounter++}</span>
-                           <span class="step-content font-mono text-sm">${stepContent}.</span>
+                           <span class="step-content font-mono text-sm">${stepContent}</span>
                          </div>`;
               }
             });
@@ -865,6 +892,7 @@
 
           if (!nextMarker) break; 
 
+          // Find the end of this reflection
           let reflectionContentEndPos = length;
           let lookaheadForNext = findNextMarkerInfo(cleanedThinking, nextMarker.endOfMarker);
           if (lookaheadForNext) {
@@ -873,6 +901,7 @@
           
           const reflectionContent = cleanedThinking.substring(nextMarker.endOfMarker, reflectionContentEndPos).trim();
 
+          // Render reflection based on type
           if (nextMarker.type === 'detailed_reflection') {
             html += `<div class="p-4 mb-3 rounded-lg bg-sky-900/30 border-l-4 border-sky-500 detailed-reflection-step">
                        <div class="font-semibold text-sky-300 mb-2">${nextMarker.markerText}</div>
@@ -894,6 +923,7 @@
                        <div class="font-mono text-sm text-amber-200">${transformMessage(reflectionContent)}</div>
                      </div>`;
           }
+          
           currentPosition = reflectionContentEndPos;
         }
         return html;
@@ -1572,21 +1602,21 @@ Your response MUST follow this exact structure for complex problems:
 
 2. **Reflection Pattern:**
    CoD steps (continue until ~${REFLECTION_FREQUENCY} tokens)
-   DETAILED REFLECTION 1: [comprehensive analysis of preceding CoD chunk]
+   **REFLECTION 1:** [comprehensive analysis of preceding CoD chunk]
    More CoD steps (continue until next ~${REFLECTION_FREQUENCY} tokens)  
-   DETAILED REFLECTION 2: [analysis of this new chunk]
+   **REFLECTION 2:** [analysis of this new chunk]
    Continue this pattern...
 
 3. **Meta-Analysis Phase** (${META_ANALYSIS_ENABLED ? 'ENABLED' : 'DISABLED'}):
    ${META_ANALYSIS_ENABLED ? `Before providing your final answer, conduct:
-   - REFLECTION SYNTHESIS: Review all previous DETAILED REFLECTION blocks
+   **META-ANALYSIS:** Review all previous REFLECTION blocks
    - Analyze connections, contradictions, and new insights between reflections
    - Identify missed opportunities or alternative approaches
    - Synthesize findings into new understanding` : ''}
 
 4. **Final Comprehensive Reflection:**
    ${META_ANALYSIS_ENABLED ? 'After meta-analysis, provide:' : 'Before your final answer, provide:'}
-   - FINAL COMPREHENSIVE REFLECTION: Deep analysis incorporating all insights${META_ANALYSIS_ENABLED ? ' from meta-analysis' : ''}
+   **FINAL COMPREHENSIVE REFLECTION:** Deep analysis incorporating all insights${META_ANALYSIS_ENABLED ? ' from meta-analysis' : ''}
 
 **DETAILED INSTRUCTIONS:**
 
@@ -1596,7 +1626,8 @@ Your response MUST follow this exact structure for complex problems:
 - Separate each step with a period
 - Track your token usage mentally to trigger reflections at ~${REFLECTION_FREQUENCY} token intervals
 
-**DETAILED REFLECTION [N] blocks (after ~${REFLECTION_FREQUENCY} tokens of CoD):**
+**REFLECTION [N] blocks (after ~${REFLECTION_FREQUENCY} tokens of CoD):**
+- Format as: **REFLECTION N:** [content]
 - NO word limit - be thorough and comprehensive
 - Analyze correctness of ALL steps in the preceding chunk
 - Verify calculations, logic, and intermediate results step-by-step
@@ -1606,8 +1637,9 @@ Your response MUST follow this exact structure for complex problems:
 - Outline what needs to be done next
 - Consider if current approach is optimal or if pivoting is needed
 
-${META_ANALYSIS_ENABLED ? `**REFLECTION SYNTHESIS (before final answer):**
-- Review ALL previous DETAILED REFLECTION blocks systematically
+${META_ANALYSIS_ENABLED ? `**META-ANALYSIS (before final answer):**
+- Format as: **META-ANALYSIS:** [content]
+- Review ALL previous REFLECTION blocks systematically
 - Look for:
   * Consistent themes across reflections
   * Contradictions that need resolution  
@@ -1618,6 +1650,7 @@ ${META_ANALYSIS_ENABLED ? `**REFLECTION SYNTHESIS (before final answer):**
 - Synthesize insights into new understanding or approach refinements` : ''}
 
 **FINAL COMPREHENSIVE REFLECTION:**
+- Format as: **FINAL COMPREHENSIVE REFLECTION:** [content]
 - Conduct deep analysis incorporating all insights${META_ANALYSIS_ENABLED ? ' from meta-analysis' : ''}
 - Verify the complete solution path
 - Check for any remaining uncertainties or assumptions
@@ -1632,8 +1665,14 @@ ${META_ANALYSIS_ENABLED ? `**REFLECTION SYNTHESIS (before final answer):**
 **Example Token Tracking:**
 - Start CoD steps
 - Count words/tokens mentally as you write
-- When approaching ~${REFLECTION_FREQUENCY} tokens, insert "DETAILED REFLECTION [N]:"
+- When approaching ~${REFLECTION_FREQUENCY} tokens, insert "**REFLECTION [N]:**"
 - Continue this pattern throughout your reasoning
+
+**CRITICAL FORMATTING RULES:**
+- All reflection markers must be bolded: **REFLECTION N:**, **META-ANALYSIS:**, **FINAL COMPREHENSIVE REFLECTION:**
+- Place reflections IMMEDIATELY after each ~${REFLECTION_FREQUENCY} token CoD chunk
+- Never save all reflections for the end - embed them throughout the process
+- Each reflection should appear right after the CoD content it analyzes
 
 **IMPORTANT:** Only use this methodology for genuinely complex problems requiring deep reasoning. For simple questions, respond normally without the CoD structure.`;
 
@@ -1892,7 +1931,7 @@ ${META_ANALYSIS_ENABLED ? `**REFLECTION SYNTHESIS (before final answer):**
       if (codWordCount) {
         COD_WORD_COUNT = parseInt(codWordCount);
       } else {
-        COD_WORD_COUNT = 12;
+        COD_WORD_COUNT = 5;
       }
 
       const reflectionFrequency = localStorage.getItem("reflectionFrequency");

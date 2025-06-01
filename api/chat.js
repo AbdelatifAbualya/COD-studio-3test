@@ -37,11 +37,12 @@ module.exports = async (req, res) => {
       });
     }
 
-    console.log('Processing request:', { 
+    console.log('Processing Advanced CoD request:', { 
       model, 
       messageCount: messages.length, 
       stream: !!stream,
-      toolsEnabled: !!(tools && tools.length > 0)
+      toolsEnabled: !!(tools && tools.length > 0),
+      isAdvancedCoD: messages.some(m => m.content?.includes('DETAILED REFLECTION') || m.content?.includes('TOKEN-BASED'))
     });
 
     // Prepare the request to Fireworks API
@@ -51,7 +52,7 @@ module.exports = async (req, res) => {
       temperature: temperature || 0.6,
       top_p: top_p || 1,
       top_k: top_k || 40,
-      max_tokens: max_tokens || 4096,
+      max_tokens: max_tokens || 8192,
       presence_penalty: presence_penalty || 0,
       frequency_penalty: frequency_penalty || 0,
       stream: stream || false

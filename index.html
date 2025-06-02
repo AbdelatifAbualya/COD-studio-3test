@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI Reasoning Studio (Advanced CoD)</title>
+  <title>AI Reasoning Studio (Qwen3-235B)</title>
   
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -98,7 +98,7 @@
     .thinking-steps {
       animation: fadeIn 0.3s ease;
     }
-    .thinking-step, .detailed-reflection-step, .reflection-step, .meta-analysis-step, .synthesis-step {
+    .thinking-step, .detailed-reflection-step, .reflection-step {
       animation: fadeIn 0.3s ease;
     }
     
@@ -205,7 +205,7 @@
           </ul>
           <div class="space-y-2">
             <button id="mobileNewThreadBtn" class="w-full bg-primary-500 hover:bg-primary-600 text-white py-2 px-4 rounded-md transition flex items-center justify-center gap-2">
-              <svg xmlns="http://www.w3.svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
               </svg>
               New Thread
@@ -222,7 +222,7 @@
     <div class="flex-1 flex flex-col overflow-hidden">
       <!-- Header -->
       <header class="bg-dark-700 border-b border-dark-600 h-16 flex items-center justify-between px-4 md:px-6">
-        <h1 id="pageTitle" class="text-xl font-semibold">AI Reasoning Studio (Advanced CoD)</h1>
+        <h1 id="pageTitle" class="text-xl font-semibold">AI Reasoning Studio (Qwen3-235B)</h1>
         <div class="flex items-center gap-3">
           <div id="currentModelDisplay" class="bg-dark-600 text-sm px-3 py-1.5 rounded-lg flex items-center">
             <span>Qwen3-235B (Fireworks AI)</span>
@@ -288,13 +288,13 @@
       <div class="p-5">
         <!-- Tab Navigation -->
         <div class="bg-dark-600 rounded-lg p-1 flex mb-5">
-          <button class="tab-btn flex-1 py-2 px-4 rounded-md text-gray-400 transition" data-tab="reasoningTab">Reasoning</button>
-          <button class="tab-btn flex-1 py-2 px-4 rounded-md text-white bg-primary-500" data-tab="parametersTab">Parameters</button>
+          <button class="tab-btn flex-1 py-2 px-4 rounded-md text-white bg-primary-500" data-tab="reasoningTab">Reasoning</button>
+          <button class="tab-btn flex-1 py-2 px-4 rounded-md text-gray-400 transition" data-tab="parametersTab">Parameters</button>
           <button class="tab-btn flex-1 py-2 px-4 rounded-md text-gray-400 transition" data-tab="toolsTab">Tools</button>
         </div>
         
         <!-- Reasoning Tab Content -->
-        <div id="reasoningTab" class="tab-content hidden">
+        <div id="reasoningTab" class="tab-content">
           <h3 class="text-lg font-medium mb-4 pb-2 border-b border-dark-600">Reasoning Method</h3>
           
           <div class="bg-dark-600 border border-dark-500 rounded-lg p-4 mb-5">
@@ -310,77 +310,59 @@
               <div class="flex items-start">
                 <input type="radio" id="codReasoning" name="reasoningMethod" value="cod" checked class="w-4 h-4 mt-1 text-primary-500 bg-dark-500 border-dark-400 focus:ring-primary-500 focus:ring-offset-dark-700">
                 <label for="codReasoning" class="ml-3 block text-sm font-medium text-white">
-                  Advanced Chain of Draft (Token-Based Reflections)
-                  <div class="text-gray-400 text-xs mt-1">Uses CoD with embedded reflections every ~150 tokens, plus meta-analysis and synthesis phases.</div>
+                  Chain of Draft (CoD) - Minimalist Reasoning
+                  <div class="text-gray-400 text-xs mt-1">Uses ultra-concise steps (≤5 words each) based on the Zoom Communications research paper. Reduces token usage by 68-92%.</div>
                 </label>
               </div>
             </div>
           </div>
           
           <div id="codOptions" class="mb-5">
-            <h4 class="text-sm font-medium text-gray-300 mb-3">Advanced CoD Configuration:</h4>
+            <h4 class="text-sm font-medium text-gray-300 mb-4">Chain of Draft Configuration:</h4>
             
-            <!-- CoD Word Count Slider -->
+            <!-- Number of CoD Steps Slider -->
             <div class="bg-dark-600 border border-dark-500 rounded-lg p-4 mb-4">
-              <div class="flex justify-between items-center mb-2">
-                <label for="codWordCount" class="block text-sm font-medium text-gray-300">CoD Step Word Count</label>
-                <span id="codWordCountValue" class="text-sm text-primary-400 font-medium">5</span>
+              <div class="flex justify-between items-center mb-3">
+                <label for="codSteps" class="block text-sm font-medium text-gray-300">Number of CoD Steps</label>
+                <span id="codStepsValue" class="text-sm text-primary-400 font-medium">10</span>
               </div>
-              <input type="range" id="codWordCount" min="2" max="12" step="1" value="5" class="w-full h-2 rounded-lg appearance-none cursor-pointer mb-2">
-              <p class="text-xs text-gray-400">Controls how many words each Chain of Draft step should target (2-12 words).</p>
+              <input type="range" id="codSteps" min="5" max="20" step="1" value="10" class="w-full h-2 rounded-lg appearance-none cursor-pointer">
+              <div class="flex justify-between text-xs text-gray-500 mt-1">
+                <span>5 (Very Concise)</span>
+                <span>20 (More Detailed)</span>
+              </div>
+              <p class="text-xs text-gray-400 mt-2">Controls how many ultra-concise reasoning steps the model will use. Each step is limited to ≤5 words.</p>
             </div>
 
-            <!-- Reflection Frequency Slider -->
+            <!-- CoD Step Length -->
             <div class="bg-dark-600 border border-dark-500 rounded-lg p-4 mb-4">
-              <div class="flex justify-between items-center mb-2">
-                <label for="reflectionFrequency" class="block text-sm font-medium text-gray-300">Reflection Frequency (Tokens)</label>
-                <span id="reflectionFrequencyValue" class="text-sm text-primary-400 font-medium">150</span>
+              <div class="flex justify-between items-center mb-3">
+                <label for="codWordLimit" class="block text-sm font-medium text-gray-300">Max Words per Step</label>
+                <span id="codWordLimitValue" class="text-sm text-primary-400 font-medium">5</span>
               </div>
-              <input type="range" id="reflectionFrequency" min="100" max="300" step="25" value="150" class="w-full h-2 rounded-lg appearance-none cursor-pointer mb-2">
-              <p class="text-xs text-gray-400">How many tokens of CoD before triggering a detailed reflection (100-300 tokens).</p>
+              <input type="range" id="codWordLimit" min="3" max="8" step="1" value="5" class="w-full h-2 rounded-lg appearance-none cursor-pointer">
+              <div class="flex justify-between text-xs text-gray-500 mt-1">
+                <span>3 (Ultra-minimal)</span>
+                <span>8 (Slightly verbose)</span>
+              </div>
+              <p class="text-xs text-gray-400 mt-2">Research shows 5 words per step is optimal. Reducing below 5 may hurt comprehension.</p>
             </div>
-            
-            <div class="bg-dark-600 border border-dark-500 rounded-lg p-3">
-                <p class="text-xs text-gray-400">
-                    Advanced Chain of Draft (Token-Based) methodology:
-                    <ul class="list-disc list-inside ml-4 mt-1">
-                        <li>Use concise CoD steps (adjustable word count above)</li>
-                        <li>Insert detailed reflection after every ~150 tokens (adjustable above)</li>
-                        <li>Place reflections immediately after each CoD chunk</li>
-                        <li>Conduct meta-analysis of all reflections before final answer</li>
-                        <li>Provide comprehensive synthesis and final reflection</li>
-                    </ul>
-                </p>
-            </div>
-          </div>
-          
-          <div class="flex justify-between items-center mb-4 pb-2 border-b border-dark-600">
-            <h3 class="text-lg font-medium">Enable Meta-Analysis Phase</h3>
-            <label class="relative inline-flex items-center cursor-pointer">
-              <input type="checkbox" id="metaAnalysisToggle" class="sr-only peer" checked>
-              <div class="w-11 h-6 bg-dark-500 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
-            </label>
-          </div>
-          
-          <div id="metaAnalysisInfo" class="bg-dark-600 border border-dark-500 rounded-lg p-4 mb-5">
-            <p class="text-gray-400 text-sm mb-3">
-              If enabled, conducts deep analysis of all previous reflections before providing the final answer, looking for new insights and connections.
-            </p>
+
             <div class="bg-dark-700 rounded-lg p-4">
               <div class="flex items-center text-purple-300 text-sm font-medium mb-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
-                How Advanced CoD Works
+                True Chain of Draft (Based on Research Paper)
               </div>
               <div class="text-gray-400 text-xs">
-                When using Advanced Chain of Draft:
+                <p>Chain of Draft reduces verbosity by 68-92% compared to Chain of Thought:</p>
                 <ul class="list-disc list-inside mt-2 space-y-1">
-                  <li>Model identifies hard math/code/logic problems automatically</li>
-                  <li>Uses concise CoD steps with configurable word count</li>
-                  <li>Embeds detailed reflections every ~150 tokens (configurable)</li>
-                  <li>Conducts meta-analysis reviewing all reflections</li>
-                  <li>Provides comprehensive final reflection before detailed answer</li>
+                  <li>Each step limited to ≤5 words (vs 50+ words in CoT)</li>
+                  <li>Focus on essential information only</li>
+                  <li>Use mathematical notation and shorthand</li>
+                  <li>Inspired by human problem-solving behavior</li>
+                  <li>Maintains or improves accuracy while using fewer tokens</li>
                 </ul>
               </div>
             </div>
@@ -388,7 +370,7 @@
         </div>
         
         <!-- Parameters Tab Content -->
-        <div id="parametersTab" class="tab-content">
+        <div id="parametersTab" class="tab-content hidden">
           <h3 class="text-lg font-medium mb-4 pb-2 border-b border-dark-600">Generation Parameters</h3>
           
           <div class="flex items-center justify-between mb-5 bg-dark-600 rounded-lg p-3 border border-dark-500">
@@ -522,9 +504,8 @@
     };
 
     let REASONING_METHOD = "cod";
-    let META_ANALYSIS_ENABLED = true;
-    let COD_WORD_COUNT = 5;
-    let REFLECTION_FREQUENCY = 150;
+    let COD_STEPS = 10;
+    let COD_WORD_LIMIT = 5;
     
     let TEMPERATURE = 0.6;
     let TOP_P = 1;
@@ -625,9 +606,9 @@
         return; 
       }
       
-      let content = `AI Reasoning Studio - Advanced ${REASONING_METHOD.toUpperCase()}`;
+      let content = `AI Reasoning Studio - ${REASONING_METHOD.toUpperCase()}`;
       if (REASONING_METHOD === "cod") { 
-        content += ` (CoD Word Count: ${COD_WORD_COUNT}, Reflection Frequency: ${REFLECTION_FREQUENCY} tokens)`; 
+        content += ` (${COD_STEPS} steps, ≤${COD_WORD_LIMIT} words/step)`; 
       }
       content += `\nModel: ${FIREWORKS_MODEL}\n\n`;
       
@@ -809,162 +790,21 @@
       
       if (reasoningMethod === "cod") {
         let html = '';
-        let currentPosition = 0;
         let codStepCounter = 1;
-        const length = cleanedThinking.length;
-
-        // Enhanced regex patterns for better marker detection
-        const findNextMarkerInfo = (text, pos) => {
-          const patterns = [
-            // Updated patterns for better matching
-            { 
-              regex: /\*\*(?:EMBEDDED\s+)?REFLECTION\s*(?:AFTER\s+(?:\d+\s+)?TOKENS?\s*)?(\d*):\*\*/gi, 
-              type: 'embedded_reflection', 
-              getName: (match) => match[1] ? `REFLECTION ${match[1]}:` : 'REFLECTION:' 
-            },
-            { 
-              regex: /\*\*REFLECTION\s*(\d+):\*\*/gi, 
-              type: 'embedded_reflection', 
-              getName: (match) => `REFLECTION ${match[1]}:` 
-            },
-            { 
-              regex: /\*\*TOKEN[_\s-]*BASED\s+REFLECTION\s*(\d*):\*\*/gi, 
-              type: 'embedded_reflection', 
-              getName: (match) => match[1] ? `TOKEN-BASED REFLECTION ${match[1]}:` : 'TOKEN-BASED REFLECTION:' 
-            },
-            { 
-              regex: /\*\*DETAILED\s+REFLECTION\s*(\d*):\*\*/gi, 
-              type: 'embedded_reflection', 
-              getName: (match) => match[1] ? `DETAILED REFLECTION ${match[1]}:` : 'DETAILED REFLECTION:' 
-            },
-            { 
-              regex: /\*\*META[_\s-]*ANALYSIS:\*\*/gi, 
-              type: 'meta_analysis', 
-              getName: () => 'META-ANALYSIS:' 
-            },
-            { 
-              regex: /\*\*REFLECTION\s+SYNTHESIS:\*\*/gi, 
-              type: 'reflection_synthesis', 
-              getName: () => 'REFLECTION SYNTHESIS:' 
-            },
-            { 
-              regex: /\*\*FINAL\s+(?:COMPREHENSIVE\s+)?REFLECTION:\*\*/gi, 
-              type: 'final_comprehensive', 
-              getName: () => 'FINAL COMPREHENSIVE REFLECTION:' 
-            }
-          ];
-
-          let matches = [];
-          
-          patterns.forEach(pattern => {
-            pattern.regex.lastIndex = 0;
-            let match = pattern.regex.exec(text.substring(pos));
-            if (match) {
-              matches.push({ 
-                type: pattern.type, 
-                index: match.index + pos, 
-                markerText: pattern.getName(match), 
-                fullMatch: match[0],
-                endOfMarker: match.index + pos + match[0].length 
-              });
-            }
-          });
-
-          if (matches.length === 0) return null;
-          
-          // Return the earliest match
-          matches.sort((a, b) => a.index - b.index);
-          return matches[0];
-        };
-
-        while (currentPosition < length) {
-          let nextMarker = findNextMarkerInfo(cleanedThinking, currentPosition);
-          let segmentEnd = nextMarker ? nextMarker.index : length;
-
-          // Process CoD segment
-          const codSegment = cleanedThinking.substring(currentPosition, segmentEnd).trim();
-          if (codSegment) {
-            // Enhanced step processing
-            let steps = codSegment.split(/\.(?=\s|$)/).filter(step => step.trim().length > 0);
-            steps.forEach(step => {
-              let stepContent = step.trim();
-              if (stepContent && stepContent.length > 1) {
-                // Add period back if it was split
-                if (!stepContent.endsWith('.') && !stepContent.endsWith('!') && !stepContent.endsWith('?')) {
-                  stepContent += '.';
-                }
-                html += `<div class="flex items-start p-3 mb-2 rounded-lg bg-slate-800/30 thinking-step">
-                           <span class="flex items-center justify-center min-w-8 h-8 mr-3 rounded-full bg-slate-700 text-primary-400 text-sm font-bold step-number">${codStepCounter++}</span>
-                           <span class="step-content font-mono text-sm">${stepContent}</span>
-                         </div>`;
-              }
-            });
-          }
-
-          if (!nextMarker) break; 
-
-          // Find the end of this reflection
-          let reflectionContentEndPos = length;
-          let lookaheadForNext = findNextMarkerInfo(cleanedThinking, nextMarker.endOfMarker);
-          if (lookaheadForNext) {
-            reflectionContentEndPos = lookaheadForNext.index;
-          }
-          
-          const reflectionContent = cleanedThinking.substring(nextMarker.endOfMarker, reflectionContentEndPos).trim();
-
-          // Enhanced reflection rendering with proper styling
-          if (nextMarker.type === 'embedded_reflection') {
-            html += `<div class="p-4 mb-3 rounded-lg bg-gradient-to-r from-cyan-900/40 to-blue-900/40 border-l-4 border-cyan-400 shadow-lg embedded-reflection-step">
-                       <div class="flex items-center mb-3">
-                         <div class="flex items-center justify-center w-6 h-6 mr-2 rounded-full bg-cyan-500/20 border border-cyan-400">
-                           <svg class="w-3 h-3 text-cyan-300" fill="currentColor" viewBox="0 0 20 20">
-                             <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"></path>
-                           </svg>
-                         </div>
-                         <div class="font-semibold text-cyan-300 text-sm">${nextMarker.markerText}</div>
-                       </div>
-                       <div class="font-mono text-sm text-cyan-100 leading-relaxed">${transformMessage(reflectionContent)}</div>
-                     </div>`;
-          } else if (nextMarker.type === 'reflection_synthesis') {
-            html += `<div class="p-4 mb-3 rounded-lg bg-gradient-to-r from-purple-900/40 to-indigo-900/40 border-l-4 border-purple-500 shadow-lg synthesis-step">
-                       <div class="flex items-center mb-3">
-                         <div class="flex items-center justify-center w-6 h-6 mr-2 rounded-full bg-purple-500/20 border border-purple-400">
-                           <svg class="w-3 h-3 text-purple-300" fill="currentColor" viewBox="0 0 20 20">
-                             <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"></path>
-                           </svg>
-                         </div>
-                         <div class="font-semibold text-purple-300 text-sm">${nextMarker.markerText}</div>
-                       </div>
-                       <div class="font-mono text-sm text-purple-100 leading-relaxed">${transformMessage(reflectionContent)}</div>
-                     </div>`;
-          } else if (nextMarker.type === 'final_comprehensive') {
-            html += `<div class="p-4 mb-3 rounded-lg bg-gradient-to-r from-emerald-900/40 to-green-900/40 border-l-4 border-emerald-500 shadow-lg final-reflection-step">
-                       <div class="flex items-center mb-3">
-                         <div class="flex items-center justify-center w-6 h-6 mr-2 rounded-full bg-emerald-500/20 border border-emerald-400">
-                           <svg class="w-3 h-3 text-emerald-300" fill="currentColor" viewBox="0 0 20 20">
-                             <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-                           </svg>
-                         </div>
-                         <div class="font-semibold text-emerald-300 text-sm">${nextMarker.markerText}</div>
-                       </div>
-                       <div class="font-mono text-sm text-emerald-100 leading-relaxed">${transformMessage(reflectionContent)}</div>
-                     </div>`;
-          } else if (nextMarker.type === 'meta_analysis') {
-            html += `<div class="p-4 mb-3 rounded-lg bg-gradient-to-r from-amber-900/40 to-orange-900/40 border-l-4 border-amber-500 shadow-lg meta-analysis-step">
-                       <div class="flex items-center mb-3">
-                         <div class="flex items-center justify-center w-6 h-6 mr-2 rounded-full bg-amber-500/20 border border-amber-400">
-                           <svg class="w-3 h-3 text-amber-300" fill="currentColor" viewBox="0 0 20 20">
-                             <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                           </svg>
-                         </div>
-                         <div class="font-semibold text-amber-300 text-sm">${nextMarker.markerText}</div>
-                       </div>
-                       <div class="font-mono text-sm text-amber-100 leading-relaxed">${transformMessage(reflectionContent)}</div>
+        
+        // Split by periods and process each sentence as a CoD step
+        let steps = cleanedThinking.split('.').filter(step => step.trim().length > 0);
+        
+        steps.forEach(step => {
+          let stepContent = step.trim();
+          if (stepContent) {
+            html += `<div class="flex items-start p-2 mb-1 rounded-lg bg-emerald-800/20 border-l-4 border-emerald-500 thinking-step">
+                       <span class="flex items-center justify-center min-w-6 h-6 mr-2 rounded-full bg-emerald-700/50 text-emerald-300 text-xs font-bold step-number">${codStepCounter++}</span>
+                       <span class="step-content font-mono text-sm text-emerald-200">${stepContent}.</span>
                      </div>`;
           }
-          
-          currentPosition = reflectionContentEndPos;
-        }
+        });
+        
         return html;
       }
       return `<div class="p-2 mb-2 border-l-2 border-slate-600">${transformMessage(cleanedThinking)}</div>`;
@@ -1028,8 +868,10 @@
               thinkingContainer.className = "thinking-steps bg-dark-800 rounded-lg p-4 mb-4 border border-dark-600";
               
               const thinkingLabel = document.createElement("div");
-              thinkingLabel.className = "text-xs uppercase tracking-wider font-semibold text-gray-400 mb-3 pb-2 border-b border-dark-500";
-              thinkingLabel.textContent = "Advanced Chain of Draft & Token-Based Reflections";
+              thinkingLabel.className = "text-xs uppercase tracking-wider font-semibold text-gray-400 mb-3 pb-2 border-b border-dark-500 flex items-center gap-2";
+              thinkingLabel.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+              </svg>Chain of Draft - Ultra-Concise Reasoning`;
               thinkingContainer.appendChild(thinkingLabel);
               
               const thinkingContentDiv = document.createElement("div");
@@ -1043,7 +885,7 @@
                 
                 const answerLabel = document.createElement("div");
                 answerLabel.className = "text-xs uppercase tracking-wider font-semibold text-primary-400 mb-3 pb-2 border-b border-dark-500";
-                answerLabel.textContent = "Final Detailed Answer";
+                answerLabel.textContent = "Final Answer";
                 answerDiv.appendChild(answerLabel);
                 
                 const answerContent = document.createElement("div");
@@ -1071,7 +913,7 @@
               if (msg.wordCount !== undefined) {
                 let badgeText = `Words: <span class="text-gray-300">${msg.wordCount}</span>`;
                 if (msg.thinkingWordCount !== undefined && msg.answerWordCount !== undefined && (msg.thinkingWordCount > 0 || msg.answerWordCount > 0)) {
-                  badgeText = `Words: <span class="text-gray-300">${msg.thinkingWordCount}</span> (think) + <span class="text-primary-300">${msg.answerWordCount}</span> (ans)`;
+                  badgeText = `Words: <span class="text-emerald-300">${msg.thinkingWordCount}</span> (CoD) + <span class="text-primary-300">${msg.answerWordCount}</span> (ans)`;
                 }
                 const wordStat = document.createElement('span');
                 wordStat.innerHTML = badgeText;
@@ -1208,7 +1050,7 @@
         attachedFilesContainer.classList.add('hidden'); 
       }
       
-      let placeholderText = "Analyzing problem complexity...";
+      let placeholderText = "Thinking...";
       addMessageToCurrentThread(placeholderText, "bot", true);
       const thread = threads.find(t => t.id === currentThreadId);
       const placeholderIndex = thread.messages.length - 1;
@@ -1589,149 +1431,30 @@
       
       updateDisplay(); 
       reasoningRadios.forEach(radio => radio.addEventListener('change', updateDisplay));
-      
-      const metaAnalysisToggle = document.getElementById('metaAnalysisToggle');
-      if (metaAnalysisToggle) { 
-        metaAnalysisToggle.addEventListener('change', () => { 
-          META_ANALYSIS_ENABLED = metaAnalysisToggle.checked; 
-          updateCoDPrompt(); 
-        }); 
-      }
-
-      // Add CoD Word Count slider listener
-      const codWordCountSlider = document.getElementById('codWordCount');
-      if (codWordCountSlider) {
-        codWordCountSlider.addEventListener('input', () => {
-          COD_WORD_COUNT = parseInt(codWordCountSlider.value);
-          const valueDisplay = document.getElementById('codWordCountValue');
-          if (valueDisplay) valueDisplay.textContent = COD_WORD_COUNT;
-          updateRangeColor(codWordCountSlider);
-          updateCoDPrompt();
-        });
-      }
-
-      // Add Reflection Frequency slider listener
-      const reflectionFrequencySlider = document.getElementById('reflectionFrequency');
-      if (reflectionFrequencySlider) {
-        reflectionFrequencySlider.addEventListener('input', () => {
-          REFLECTION_FREQUENCY = parseInt(reflectionFrequencySlider.value);
-          const valueDisplay = document.getElementById('reflectionFrequencyValue');
-          if (valueDisplay) valueDisplay.textContent = REFLECTION_FREQUENCY;
-          updateRangeColor(reflectionFrequencySlider);
-          updateCoDPrompt();
-        });
-      }
     }
 
     function updateCoDPrompt() {
-      let basePrompt = `You are an AI assistant specialized in solving complex problems through systematic reasoning.
+      // True Chain of Draft prompt based on the research paper
+      let basePrompt = `You are an AI assistant that uses Chain of Draft (CoD) reasoning, based on the research by Zoom Communications.
 
-**CRITICAL RULE: For hard math, code, or logic problems, you MUST embed reflections immediately after every ~${REFLECTION_FREQUENCY} tokens throughout your reasoning, NOT at the end!**
+When solving problems, think step-by-step using the Chain of Draft methodology:
 
-**PROBLEM IDENTIFICATION:**
-When you encounter HARD MATH, CODE, or LOGIC problems (including but not limited to: complex calculations, multi-step algorithms, debugging code, proof-based reasoning, optimization problems, or any task requiring deep analytical thinking), automatically engage the following Advanced Chain of Draft methodology.
+1. **Ultra-Concise Steps**: Each reasoning step must be ≤${COD_WORD_LIMIT} words. Use mathematical notation, shorthand, and essential information only.
+2. **Target ${COD_STEPS} steps**: Aim to use approximately ${COD_STEPS} reasoning steps to solve the problem.
+3. **Minimize verbosity**: Focus on critical insights only, inspired by how humans jot down brief notes when solving problems.
 
-**ADVANCED CHAIN OF DRAFT (TOKEN-BASED REFLECTIONS) STRUCTURE:**
+Structure your response as follows:
+- First, provide your concise reasoning steps (≤${COD_WORD_LIMIT} words each)
+- Then write "####" on a new line
+- Finally, provide a complete, detailed answer explaining your solution
 
-Your response MUST follow this exact structure for complex problems:
+Example Chain of Draft steps:
+• Initial value: 20 items
+• Items given away: unknown
+• Remaining: 12 items  
+• Given away = 20 - 12 = 8
 
-1. **Token-Based CoD with IMMEDIATE Embedded Reflections:**
-   - Use concise CoD steps (target ${COD_WORD_COUNT} words per step)
-   - **CRITICAL**: After approximately every ${REFLECTION_FREQUENCY} tokens of CoD content, IMMEDIATELY insert a detailed reflection
-   - **NEVER save reflections for the end** - place each reflection immediately after the CoD chunk it analyzes
-   - Continue this pattern throughout your reasoning
-
-2. **MANDATORY Reflection Pattern (EMBED IMMEDIATELY):**
-   \`\`\`
-   CoD steps (continue until ~${REFLECTION_FREQUENCY} tokens)
-   **EMBEDDED REFLECTION AFTER ${REFLECTION_FREQUENCY} TOKENS 1:** [comprehensive analysis of preceding CoD chunk]
-   More CoD steps (continue until next ~${REFLECTION_FREQUENCY} tokens)  
-   **EMBEDDED REFLECTION AFTER ${REFLECTION_FREQUENCY} TOKENS 2:** [analysis of this new chunk]
-   Continue this pattern...
-   \`\`\`
-
-3. **Meta-Analysis Phase** (${META_ANALYSIS_ENABLED ? 'ENABLED' : 'DISABLED'}):
-   ${META_ANALYSIS_ENABLED ? `Before providing your final answer, conduct:
-   **META-ANALYSIS:** Review all previous EMBEDDED REFLECTION blocks
-   - Analyze connections, contradictions, and new insights between reflections
-   - Identify missed opportunities or alternative approaches
-   - Synthesize findings into new understanding` : ''}
-
-4. **Final Comprehensive Reflection:**
-   ${META_ANALYSIS_ENABLED ? 'After meta-analysis, provide:' : 'Before your final answer, provide:'}
-   **FINAL COMPREHENSIVE REFLECTION:** Deep analysis incorporating all insights${META_ANALYSIS_ENABLED ? ' from meta-analysis' : ''}
-
-**DETAILED INSTRUCTIONS:**
-
-**CoD Steps (target ${COD_WORD_COUNT} words each):**
-- Use mathematical notation and formulas where applicable
-- Focus on key calculations and essential intermediate results  
-- Separate each step with a period
-- **Track your token usage mentally** - after ~${REFLECTION_FREQUENCY} tokens, IMMEDIATELY embed a reflection
-
-**EMBEDDED REFLECTION [N] blocks (PLACE IMMEDIATELY after ~${REFLECTION_FREQUENCY} tokens of CoD):**
-- Format as: **EMBEDDED REFLECTION AFTER ${REFLECTION_FREQUENCY} TOKENS N:** [content]
-- Alternative formats: **TOKEN-BASED REFLECTION N:** or **REFLECTION N:**
-- NO word limit - be thorough and comprehensive
-- Analyze correctness of ALL steps in the preceding chunk
-- Verify calculations, logic, and intermediate results step-by-step
-- Check for potential errors, edge cases, or alternative approaches
-- Assess confidence levels and identify uncertainties
-- Note patterns, insights, or connections discovered
-- Outline what needs to be done next
-- Consider if current approach is optimal or if pivoting is needed
-
-${META_ANALYSIS_ENABLED ? `**META-ANALYSIS (before final answer):**
-- Format as: **META-ANALYSIS:** [content]
-- Review ALL previous EMBEDDED REFLECTION blocks systematically
-- Look for:
-  * Consistent themes across reflections
-  * Contradictions that need resolution  
-  * Evolving understanding throughout the process
-  * Missed connections between different solution parts
-  * Alternative solution paths that emerged
-  * Areas where confidence was low and need verification
-- Synthesize insights into new understanding or approach refinements` : ''}
-
-**FINAL COMPREHENSIVE REFLECTION:**
-- Format as: **FINAL COMPREHENSIVE REFLECTION:** [content]
-- Conduct deep analysis incorporating all insights${META_ANALYSIS_ENABLED ? ' from meta-analysis' : ''}
-- Verify the complete solution path
-- Check for any remaining uncertainties or assumptions
-- Confirm the solution addresses all aspects of the original problem
-
-**After the '####' separator, provide your final detailed answer:**
-- Comprehensive explanation of the solution
-- Clear step-by-step walkthrough of the final approach
-- Justification for key decisions made during reasoning
-- Final verification that the solution is correct and complete
-
-**CRITICAL TOKEN TRACKING EXAMPLE:**
-Start CoD steps:
-"Initial problem setup. Container A has 8L water." [Track tokens: ~10]
-"Container B and C are empty initially." [Track tokens: ~20]
-"Goal: specific sequence of minimum pours." [Track tokens: ~30]
-"First pour: A→B until B full at 5L." [Track tokens: ~40]
-...continue counting...
-[When approaching ~${REFLECTION_FREQUENCY} tokens] 
-**EMBEDDED REFLECTION AFTER ${REFLECTION_FREQUENCY} TOKENS 1:** [Detailed analysis of above CoD chunk]
-...continue with more CoD steps and embed next reflection after another ~${REFLECTION_FREQUENCY} tokens...
-
-**FORMATTING RULES - CRITICAL FOR PROPER DISPLAY:**
-- All reflection markers MUST be bolded: **EMBEDDED REFLECTION AFTER ${REFLECTION_FREQUENCY} TOKENS N:**
-- Alternative acceptable formats: **TOKEN-BASED REFLECTION N:**, **REFLECTION N:**
-- **NEVER save reflections for the end** - embed them immediately after each ~${REFLECTION_FREQUENCY} token chunk
-- Each reflection should appear right after the CoD content it analyzes
-- Do NOT wait until you have written many CoD steps to start reflecting
-
-**TOKEN-BASED EMBEDDING STRATEGY:**
-1. Start your CoD reasoning
-2. Mentally count tokens/words as you write (~3-4 words per token typically)
-3. When you reach approximately ${REFLECTION_FREQUENCY} tokens, STOP and embed a reflection
-4. Continue with more CoD steps
-5. Repeat the embedding pattern throughout your reasoning
-
-**IMPORTANT:** Only use this methodology for genuinely complex problems requiring deep reasoning. For simple questions, respond normally without the CoD structure.`;
+Each step should capture only essential progress toward the solution, using mathematical notation where possible.`;
 
       PROMPTS.cod = basePrompt;
     }
@@ -1772,6 +1495,15 @@ Start CoD steps:
           slider.addEventListener('input', () => { 
             valueDisplay.textContent = slider.value; 
             updateRangeColor(slider); 
+            
+            // Update CoD-specific settings
+            if (slider.id === 'codSteps') {
+              COD_STEPS = parseInt(slider.value);
+              updateCoDPrompt();
+            } else if (slider.id === 'codWordLimit') {
+              COD_WORD_LIMIT = parseInt(slider.value);
+              updateCoDPrompt();
+            }
           });
         }
       });
@@ -1789,17 +1521,14 @@ Start CoD steps:
       const reasoningRadio = document.getElementById(`${REASONING_METHOD}Reasoning`); 
       if (reasoningRadio) reasoningRadio.checked = true;
       
-      const metaAnalysisToggle = document.getElementById('metaAnalysisToggle'); 
-      if (metaAnalysisToggle) metaAnalysisToggle.checked = META_ANALYSIS_ENABLED;
-      
       setSliderAndValue("temp", TEMPERATURE); 
       setSliderAndValue("topP", TOP_P); 
       setSliderAndValue("topK", TOP_K); 
       setSliderAndValue("maxTokens", MAX_TOKENS); 
       setSliderAndValue("presencePenalty", PRESENCE_PENALTY); 
       setSliderAndValue("frequencyPenalty", FREQUENCY_PENALTY);
-      setSliderAndValue("codWordCount", COD_WORD_COUNT);
-      setSliderAndValue("reflectionFrequency", REFLECTION_FREQUENCY);
+      setSliderAndValue("codSteps", COD_STEPS);
+      setSliderAndValue("codWordLimit", COD_WORD_LIMIT);
       
       setupCODOptionsDisplay(); 
       setupMcpToolsOptions();
@@ -1810,7 +1539,7 @@ Start CoD steps:
       const modal = document.getElementById("settingsModal"); 
       if (modal) modal.style.display = "flex";
       
-      // Set default tab to Parameters
+      // Set default tab to Reasoning
       const tabButtons = document.querySelectorAll('.tab-btn'); 
       const tabContents = document.querySelectorAll('.tab-content');
       
@@ -1824,13 +1553,13 @@ Start CoD steps:
         btn.classList.add('text-gray-400'); 
       });
       
-      const parametersTabBtn = document.querySelector('.tab-btn[data-tab="parametersTab"]'); 
-      const parametersTab = document.getElementById('parametersTab');
-      if (parametersTabBtn && parametersTab) { 
-        parametersTabBtn.classList.add('bg-primary-500', 'text-white'); 
-        parametersTabBtn.classList.remove('text-gray-400'); 
-        parametersTab.classList.add('active'); 
-        parametersTab.style.display = 'block'; 
+      const reasoningTabBtn = document.querySelector('.tab-btn[data-tab="reasoningTab"]'); 
+      const reasoningTab = document.getElementById('reasoningTab');
+      if (reasoningTabBtn && reasoningTab) { 
+        reasoningTabBtn.classList.add('bg-primary-500', 'text-white'); 
+        reasoningTabBtn.classList.remove('text-gray-400'); 
+        reasoningTab.classList.add('active'); 
+        reasoningTab.style.display = 'block'; 
       }
     }
     
@@ -1861,15 +1590,6 @@ Start CoD steps:
         if (radio.checked) REASONING_METHOD = radio.value;
       }
       
-      const metaAnalysisToggle = document.getElementById('metaAnalysisToggle'); 
-      if (metaAnalysisToggle) META_ANALYSIS_ENABLED = metaAnalysisToggle.checked;
-
-      const codWordCountSlider = document.getElementById('codWordCount');
-      if (codWordCountSlider) COD_WORD_COUNT = parseInt(codWordCountSlider.value);
-
-      const reflectionFrequencySlider = document.getElementById('reflectionFrequency');
-      if (reflectionFrequencySlider) REFLECTION_FREQUENCY = parseInt(reflectionFrequencySlider.value);
-      
       TEMPERATURE = parseFloat(document.getElementById("temp").value); 
       if (TEMPERATURE === 0 && document.getElementById("temp").min === "0") TEMPERATURE = 0.01;
       TOP_P = parseFloat(document.getElementById("topP").value); 
@@ -1877,6 +1597,8 @@ Start CoD steps:
       PRESENCE_PENALTY = parseFloat(document.getElementById("presencePenalty").value); 
       FREQUENCY_PENALTY = parseFloat(document.getElementById("frequencyPenalty").value); 
       MAX_TOKENS = parseInt(document.getElementById("maxTokens").value);
+      COD_STEPS = parseInt(document.getElementById("codSteps").value);
+      COD_WORD_LIMIT = parseInt(document.getElementById("codWordLimit").value);
       
       ENABLED_MCP_TOOLS = []; 
       document.querySelectorAll('input[name="mcp_tools"]').forEach(checkbox => { 
@@ -1890,15 +1612,14 @@ Start CoD steps:
       }
       
       localStorage.setItem("reasoningMethod", REASONING_METHOD); 
-      localStorage.setItem("metaAnalysisEnabled", META_ANALYSIS_ENABLED.toString()); 
-      localStorage.setItem("codWordCount", COD_WORD_COUNT.toString());
-      localStorage.setItem("reflectionFrequency", REFLECTION_FREQUENCY.toString());
       localStorage.setItem("temperature", TEMPERATURE.toString()); 
       localStorage.setItem("topP", TOP_P.toString()); 
       localStorage.setItem("topK", TOP_K.toString()); 
       localStorage.setItem("presencePenalty", PRESENCE_PENALTY.toString()); 
       localStorage.setItem("frequencyPenalty", FREQUENCY_PENALTY.toString()); 
       localStorage.setItem("maxTokens", MAX_TOKENS.toString()); 
+      localStorage.setItem("codSteps", COD_STEPS.toString());
+      localStorage.setItem("codWordLimit", COD_WORD_LIMIT.toString());
       localStorage.setItem("enabledMcpTools", JSON.stringify(ENABLED_MCP_TOOLS)); 
       localStorage.setItem("enableWebSearchQuickToggle", enableWebSearchQuickToggle.toString());
       
@@ -1977,27 +1698,6 @@ Start CoD steps:
     function loadPersistedSettings() {
       REASONING_METHOD = localStorage.getItem("reasoningMethod") || "cod";
       
-      const metaAnalysis = localStorage.getItem("metaAnalysisEnabled"); 
-      if (metaAnalysis !== null) {
-        META_ANALYSIS_ENABLED = metaAnalysis === "true"; 
-      } else {
-        META_ANALYSIS_ENABLED = true; 
-      }
-
-      const codWordCount = localStorage.getItem("codWordCount");
-      if (codWordCount) {
-        COD_WORD_COUNT = parseInt(codWordCount);
-      } else {
-        COD_WORD_COUNT = 5;
-      }
-
-      const reflectionFrequency = localStorage.getItem("reflectionFrequency");
-      if (reflectionFrequency) {
-        REFLECTION_FREQUENCY = parseInt(reflectionFrequency);
-      } else {
-        REFLECTION_FREQUENCY = 150;
-      }
-      
       const temp = localStorage.getItem("temperature"); 
       if (temp) TEMPERATURE = parseFloat(temp);
       
@@ -2022,6 +1722,20 @@ Start CoD steps:
         MAX_TOKENS = parseInt(maxTokens); 
       } else {
         MAX_TOKENS = 8192;
+      }
+
+      const codSteps = localStorage.getItem("codSteps");
+      if (codSteps) {
+        COD_STEPS = parseInt(codSteps);
+      } else {
+        COD_STEPS = 10;
+      }
+
+      const codWordLimit = localStorage.getItem("codWordLimit");
+      if (codWordLimit) {
+        COD_WORD_LIMIT = parseInt(codWordLimit);
+      } else {
+        COD_WORD_LIMIT = 5;
       }
       
       const streaming = localStorage.getItem('streamingEnabled'); 

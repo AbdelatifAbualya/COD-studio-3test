@@ -37,23 +37,12 @@ module.exports = async (req, res) => {
       });
     }
 
-    // Enhanced logging for Advanced CoD detection
-    const hasAdvancedCoD = messages.some(m => 
-      m.content?.includes('EMBEDDED REFLECTION') || 
-      m.content?.includes('TOKEN-BASED REFLECTION') ||
-      m.content?.includes('REFLECTION AFTER') ||
-      m.content?.includes('Chain of Draft') ||
-      m.content?.includes('~150 tokens') ||
-      m.content?.includes('embed reflections immediately')
-    );
-
-    console.log('Processing Enhanced CoD request:', { 
+    console.log('Processing Chain of Draft request:', { 
       model, 
       messageCount: messages.length, 
       stream: !!stream,
       toolsEnabled: !!(tools && tools.length > 0),
-      isEnhancedAdvancedCoD: hasAdvancedCoD,
-      lastMessagePreview: messages[messages.length - 1]?.content?.substring(0, 100) + "..."
+      lastMessage: messages[messages.length - 1]?.content?.substring(0, 100) + '...'
     });
 
     // Prepare the request to Fireworks API
@@ -63,7 +52,7 @@ module.exports = async (req, res) => {
       temperature: temperature || 0.6,
       top_p: top_p || 1,
       top_k: top_k || 40,
-      max_tokens: max_tokens || 8192,
+      max_tokens: max_tokens || 4096,
       presence_penalty: presence_penalty || 0,
       frequency_penalty: frequency_penalty || 0,
       stream: stream || false
@@ -118,28 +107,11 @@ module.exports = async (req, res) => {
       const decoder = new TextDecoder();
 
       try {
-        let tokenCount = 0;
-        let lastChunkTime = Date.now();
-        
         while (true) {
           const { done, value } = await reader.read();
-          if (done) {
-            console.log(`Stream complete. Total tokens processed: ${tokenCount}`);
-            break;
-          }
+          if (done) break;
           
           const chunk = decoder.decode(value, { stream: true });
-          
-          // Enhanced logging for Advanced CoD responses
-          if (hasAdvancedCoD && chunk.includes('REFLECTION')) {
-            const currentTime = Date.now();
-            console.log(`CoD Reflection detected in stream at token ~${tokenCount}, time elapsed: ${currentTime - lastChunkTime}ms`);
-            lastChunkTime = currentTime;
-          }
-          
-          // Estimate token count (rough approximation: ~4 chars per token)
-          tokenCount += Math.ceil(chunk.length / 4);
-          
           res.write(chunk);
         }
         res.end();
@@ -167,26 +139,11 @@ module.exports = async (req, res) => {
       }
 
       const data = await response.json();
-      
-      // Enhanced logging for Advanced CoD responses
-      if (hasAdvancedCoD && data.choices?.[0]?.message?.content) {
-        const responseContent = data.choices[0].message.content;
-        const reflectionCount = (responseContent.match(/\*\*(?:EMBEDDED\s+)?(?:TOKEN-BASED\s+)?REFLECTION/gi) || []).length;
-        const metaAnalysisCount = (responseContent.match(/\*\*META[_\s-]*ANALYSIS/gi) || []).length;
-        const finalReflectionCount = (responseContent.match(/\*\*FINAL\s+(?:COMPREHENSIVE\s+)?REFLECTION/gi) || []).length;
-        
-        console.log('Enhanced CoD Response Analysis:', {
-          totalTokens: data.usage?.total_tokens || 'unknown',
-          completionTokens: data.usage?.completion_tokens || 'unknown',
-          embeddedReflections: reflectionCount,
-          metaAnalysisBlocks: metaAnalysisCount,
-          finalReflections: finalReflectionCount,
-          hasProperEmbedding: reflectionCount > 1 // Multiple reflections suggest proper embedding
-        });
-        
-        // Log first 200 chars to verify structure
-        console.log('Response structure preview:', responseContent.substring(0, 200) + '...');
-      }
+      console.log('Chain of Draft response received:', {
+        choices: data.choices?.length || 0,
+        usage: data.usage,
+        contentLength: data.choices?.[0]?.message?.content?.length || 0
+      });
       
       return res.status(200).json(data);
     }
